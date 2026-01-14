@@ -1,0 +1,7 @@
+{
+  "name": "mano-a-mano-vanilla",
+  "version": "1.0.0",
+  "dependencies": {
+    "@vercel/postgres": "latest"
+  }
+}

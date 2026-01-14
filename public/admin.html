@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Mano a Mano</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div id="loginScreen" class="container" style="max-width: 400px; text-align: center;">
+        <h2>Acceso Restringido</h2>
+        <input type="password" id="passwordInput" placeholder="Contraseña de Admin" style="margin-bottom: 10px;">
+        <button onclick="checkLogin()" class="btn-primary">Entrar</button>
+    </div>
+
+    <div id="dashboard" style="display: none; padding: 20px;">
+        <div class="admin-header">
+            <h2 style="color: var(--azul-gob);">Panel de Control</h2>
+            <button onclick="exportarExcel()" class="btn-export">📥 Descargar Excel</button>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; overflow-x: auto;">
+            <table id="tablaRegistros">
+                <thead>
+                    <tr>
+                        <th>Institución</th>
+                        <th>Lugar</th>
+                        <th>Nombre / Puesto</th>
+                        <th>Contacto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modalEdit" class="modal">
+        <div class="modal-content">
+            <h3>Editar Registro</h3>
+            <input type="hidden" id="editId">
+            <div class="form-group"><label>Nombre</label><input id="editNombre"></div>
+            <div class="form-group"><label>Puesto</label><input id="editPuesto"></div>
+            <div class="form-group"><label>Correo</label><input id="editCorreo"></div>
+            <div class="form-group"><label>Celular</label><input id="editCelular"></div>
+            <div style="text-align: right; margin-top: 10px;">
+                <button onclick="cerrarModal()" style="padding: 10px;">Cancelar</button>
+                <button onclick="guardarEdicion()" class="btn-primary" style="width: auto;">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

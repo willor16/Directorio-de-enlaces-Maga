@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Mano a Mano</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: var(--azul-gob); border: 2px solid var(--azul-gob); display: inline-block; padding: 5px 15px;">LOGO MANO A MANO</h2>
+        </div>
+        <h1>Estrategia Mano a Mano</h1>
+        <p class="subtitle">Registro de Enlaces Interinstitucionales</p>
+
+        <form id="registroForm">
+            <div class="form-group">
+                <label>Institución</label>
+                <select id="institucion" required>
+                    <option value="">Seleccione...</option>
+                    <option>MAGA</option><option>MINEDUC</option><option>MSPAS</option><option>MIDES</option>
+                    <option>SOSEP</option><option>SBS</option><option>SVET</option><option>MINECO</option>
+                    <option>MICIVI</option><option>MARN</option><option>Gobernación</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Departamento</label>
+                    <select id="departamento" required onchange="cargarMunicipios()"></select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Municipio</label>
+                    <select id="municipio" required disabled></select>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+
+            <div class="form-group"><label>Nombre Completo</label><input type="text" id="nombre" required></div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;"><label>Puesto</label><input type="text" id="puesto" required></div>
+                <div class="form-group" style="flex: 1;"><label>Unidad/Dirección</label><input type="text" id="unidad" required></div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;"><label>Correo</label><input type="email" id="correo" required></div>
+                <div class="form-group" style="flex: 1;"><label>Celular</label><input type="tel" id="celular" required></div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="btnGuardar">GUARDAR REGISTRO</button>
+        </form>
+        <div style="text-align: center; margin-top: 20px;"><a href="admin.html" style="font-size: 12px; color: #999;">Admin</a></div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
