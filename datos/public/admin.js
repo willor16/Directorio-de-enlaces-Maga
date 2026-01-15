@@ -33,7 +33,6 @@ async function cargarConfiguraciones() {
 
     listaInst.innerHTML = ''; listaDepto.innerHTML = ''; listaMuni.innerHTML = '';
     
-    // Guardar selección del dropdown
     const deptoVal = selectDepto.value;
     selectDepto.innerHTML = '<option value="" disabled selected>Selecciona Depto...</option>';
 
@@ -47,7 +46,6 @@ async function cargarConfiguraciones() {
         } else if (item.categoria === 'departamento') {
             li.innerHTML = `<span>${item.valor}</span> ${btn}`;
             listaDepto.appendChild(li);
-            // Llenar dropdown
             const opt = document.createElement('option');
             opt.value = item.valor; opt.textContent = item.valor;
             selectDepto.appendChild(opt);
@@ -92,7 +90,7 @@ async function borrarItem(id) {
     }
 }
 
-// --- TABLA Y EXCEL ---
+// --- TABLA Y REGISTROS ---
 function cargarRegistros(json) {
     const tbody = document.getElementById('tablaCuerpo');
     tbody.innerHTML = '';
@@ -118,26 +116,26 @@ async function borrarRegistro(id) {
     }
 }
 
-// --- FUNCIÓN EXPORTAR A EXCEL ---
+// --- FUNCIÓN EXPORTAR A EXCEL (USANDO SHEETJS) ---
 function exportarExcel() {
-    let downloadLink;
-    const dataType = 'application/vnd.ms-excel';
-    const tableSelect = document.getElementById('tablaRegistros');
-    const tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
-    
-    // Crear nombre del archivo con fecha
-    const fecha = new Date().toISOString().slice(0,10);
-    const filename = `Reporte-ManoAMano-${fecha}.xls`;
-    
-    downloadLink = document.createElement("a");
-    document.body.appendChild(downloadLink);
-    
-    if (navigator.msSaveOrOpenBlob) {
-        const blob = new Blob(['\ufeff', tableHTML], { type: dataType });
-        navigator.msSaveOrOpenBlob(blob, filename);
-    } else {
-        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
-        downloadLink.download = filename;
-        downloadLink.click();
+    // 1. Clonar la tabla para no afectar la vista
+    const tabla = document.getElementById("tablaRegistros");
+    const tablaClonada = tabla.cloneNode(true);
+
+    // 2. Eliminar la última columna (Acciones/Borrar) de cada fila
+    for (let i = 0; i < tablaClonada.rows.length; i++) {
+        const row = tablaClonada.rows[i];
+        if (row.cells.length > 0) {
+            row.deleteCell(row.cells.length - 1);
+        }
     }
+
+    // 3. Crear el libro de Excel
+    const wb = XLSX.utils.table_to_book(tablaClonada, { sheet: "Registros" });
+
+    // 4. Generar nombre con fecha
+    const fecha = new Date().toISOString().slice(0, 10);
+    
+    // 5. Descargar archivo .xlsx real
+    XLSX.writeFile(wb, `Reporte-ManoAMano-${fecha}.xlsx`);
 }

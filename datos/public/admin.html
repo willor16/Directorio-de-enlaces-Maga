@@ -6,21 +6,23 @@
     <title>Admin - Mano a Mano</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
-        body { background-color: #f4f7f6; } /* Un fondo gris muy suave para que resalte la tarjeta */
+        body { background-color: #f4f7f6; }
         .gestion-box { background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd; }
         .lista-items { padding-left: 20px; max-height: 150px; overflow-y: auto; }
         .lista-items li { margin-bottom: 5px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;}
         .btn-excel { background-color: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-right: 10px;}
         
-        /* Estilos específicos para la tarjeta de login */
+        /* Estilos de la tarjeta de login */
         .login-card {
             max-width: 400px;
-            margin: 60px auto; /* Centrado vertical y horizontal */
+            margin: 60px auto;
             padding: 30px;
             background: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* Sombra suave */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             text-align: center;
         }
         .login-input {
@@ -29,7 +31,7 @@
             margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            box-sizing: border-box; /* Para que el padding no aumente el ancho */
+            box-sizing: border-box;
             font-size: 16px;
         }
     </style>
@@ -50,6 +52,7 @@
             Entrar
         </button>
     </div>
+
     <div id="dashboard" style="display: none; max-width: 1200px; margin: 0 auto; padding: 20px; background: #fff; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
