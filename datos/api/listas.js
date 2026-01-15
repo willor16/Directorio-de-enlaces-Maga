@@ -12,24 +12,24 @@ export default async function handler(request, response) {
         if (request.method === 'GET') {
             const { tipo, padre } = request.query;
 
-            // Si piden municipios de un departamento específico
+            // 1. Si piden municipios de un departamento específico
             if (tipo === 'municipio' && padre) {
                 const { rows } = await sql`SELECT * FROM configuracion WHERE categoria = 'municipio' AND padre = ${padre} ORDER BY valor ASC;`;
                 return response.status(200).json(rows);
             }
             
-            // Si piden una categoría general (institucion, departamento, o todos los municipios)
+            // 2. Si piden una categoría general (institucion, departamento)
             if (tipo) {
                 const { rows } = await sql`SELECT * FROM configuracion WHERE categoria = ${tipo} ORDER BY valor ASC;`;
                 return response.status(200).json(rows);
             }
 
-            // Si no piden nada, devolvemos todo (útil para el admin)
+            // 3. Si no piden nada, devolvemos todo (para el admin)
             const { rows } = await sql`SELECT * FROM configuracion ORDER BY categoria, valor ASC;`;
             return response.status(200).json(rows);
         }
 
-        // --- SEGURIDAD ---
+        // --- SEGURIDAD: VERIFICAR PASSWORD PARA GUARDAR/BORRAR ---
         const password = request.headers['x-admin-password'];
         if (password !== process.env.ADMIN_PASSWORD) {
             return response.status(401).json({ error: 'Contraseña incorrecta' });
@@ -40,7 +40,6 @@ export default async function handler(request, response) {
             const body = JSON.parse(request.body);
             const { categoria, valor, padre } = body;
             
-            // El campo "padre" es opcional (solo para municipios)
             await sql`INSERT INTO configuracion (categoria, valor, padre) VALUES (${categoria}, ${valor}, ${padre || null});`;
             return response.status(200).json({ success: true });
         }
