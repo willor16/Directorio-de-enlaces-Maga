@@ -1,5 +1,5 @@
 let passwordGuardada = "";
-let todosLosRegistros = []; // Guardaremos los datos aquí para usarlos al exportar
+let todosLosRegistros = [];
 
 // --- LOGIN ---
 async function checkLogin() {
@@ -12,13 +12,10 @@ async function checkLogin() {
         document.getElementById('dashboard').style.display = 'block';
         
         const json = await res.json();
-        todosLosRegistros = json.data; // Guardamos en variable global
-        
-        cargarRegistrosPorInstitucion(todosLosRegistros); // Nueva función de carga
+        todosLosRegistros = json.data;
+        cargarRegistrosPorInstitucion(todosLosRegistros);
         cargarConfiguraciones();
-    } else {
-        Swal.fire('Error', 'Contraseña incorrecta', 'error');
-    }
+    } else { Swal.fire('Error', 'Contraseña incorrecta', 'error'); }
 }
 
 function cerrarSesion() {
@@ -27,36 +24,99 @@ function cerrarSesion() {
     window.location.href = "/";
 }
 
-// --- GESTIÓN DE CONFIGURACIÓN (Sin cambios) ---
+// --- SIDEBAR Y SOLICITUDES ---
+window.toggleSidebar = function() {
+    const sb = document.getElementById('sidebarSolicitudes');
+    if (sb.style.right === '0px') sb.style.right = '-400px';
+    else {
+        sb.style.right = '0px';
+        cargarSolicitudesPendientes();
+    }
+}
+
+async function cargarSolicitudesPendientes() {
+    const contenedor = document.getElementById('listaSolicitudes');
+    contenedor.innerHTML = '<p>Cargando...</p>';
+
+    if(!passwordGuardada) {
+        contenedor.innerHTML = '<p>Inicia sesión primero.</p>';
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/ediciones', { method: 'GET', headers: { 'x-admin-password': passwordGuardada } });
+        const solicitudes = await res.json();
+
+        if (solicitudes.length === 0) {
+            contenedor.innerHTML = '<p style="color:#999;">No hay solicitudes pendientes.</p>';
+            return;
+        }
+
+        contenedor.innerHTML = '';
+        solicitudes.forEach(sol => {
+            const nuevos = sol.nuevos_datos;
+            const card = document.createElement('div');
+            card.style.cssText = "background: #f9f9f9; border: 1px solid #eee; padding: 10px; margin-bottom: 10px; border-radius: 8px; font-size: 0.9em;";
+            
+            card.innerHTML = `
+                <div style="font-weight:bold; margin-bottom:5px; color:#005696;">${nuevos.nombre}</div>
+                <div style="margin-bottom:10px; font-size:0.85em;">
+                    <strong>Cambios:</strong><br>
+                    ${nuevos.puesto} - ${nuevos.unidad}<br>
+                    ${nuevos.correo} / ${nuevos.celular}
+                </div>
+                <div style="display:flex; gap:5px;">
+                    <button onclick='aprobarEdicion(${JSON.stringify(sol)})' style="flex:1; background:#28a745; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">✔</button>
+                    <button onclick="rechazarEdicion(${sol.solicitud_id})" style="flex:1; background:#dc3545; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">✕</button>
+                </div>
+            `;
+            contenedor.appendChild(card);
+        });
+    } catch (e) { contenedor.innerHTML = 'Error al cargar.'; }
+}
+
+async function aprobarEdicion(solicitud) {
+    if(!confirm('¿Aprobar cambios?')) return;
+    try {
+        const res = await fetch('/api/ediciones', {
+            method: 'PUT',
+            headers: { 'x-admin-password': passwordGuardada },
+            body: JSON.stringify({ solicitud_id: solicitud.solicitud_id, registro_id: solicitud.id, datos_finales: solicitud.nuevos_datos })
+        });
+        if(res.ok) {
+            Swal.fire('Aprobado', 'Registro actualizado.', 'success');
+            cargarSolicitudesPendientes();
+            checkLogin(); // Recargar tablas principales
+        }
+    } catch(e) { console.error(e); }
+}
+
+async function rechazarEdicion(id) {
+    if(!confirm('¿Rechazar solicitud?')) return;
+    try {
+        await fetch(`/api/ediciones?solicitud_id=${id}`, { method: 'DELETE', headers: { 'x-admin-password': passwordGuardada } });
+        cargarSolicitudesPendientes();
+    } catch(e) { console.error(e); }
+}
+
+// --- GESTIÓN LISTAS (Mismo código que antes) ---
 async function cargarConfiguraciones() {
-    const res = await fetch('/api/listas');
-    const datos = await res.json();
-    const listaInst = document.getElementById('listaInstituciones');
-    const listaDepto = document.getElementById('listaDepartamentos');
-    const listaMuni = document.getElementById('listaMunicipios');
-    const selectDepto = document.getElementById('selectDeptoParaMuni');
-    listaInst.innerHTML = ''; listaDepto.innerHTML = ''; listaMuni.innerHTML = '';
-    const deptoVal = selectDepto.value;
-    selectDepto.innerHTML = '<option value="" disabled selected>Selecciona Depto...</option>';
+    const res = await fetch('/api/listas'); const datos = await res.json();
+    const listaInst = document.getElementById('listaInstituciones'); const listaDepto = document.getElementById('listaDepartamentos'); const listaMuni = document.getElementById('listaMunicipios'); const selectDepto = document.getElementById('selectDeptoParaMuni');
+    listaInst.innerHTML = ''; listaDepto.innerHTML = ''; listaMuni.innerHTML = ''; selectDepto.innerHTML = '<option value="" disabled selected>Selecciona Depto...</option>';
     datos.forEach(item => {
         const btn = `<button onclick="borrarItem(${item.id})" style="color:red;border:none;background:none;cursor:pointer;font-weight:bold;">X</button>`;
         const li = document.createElement('li');
-        if (item.categoria === 'institucion') {
-            li.innerHTML = `<span>${item.valor}</span> ${btn}`; listaInst.appendChild(li);
-        } else if (item.categoria === 'departamento') {
-            li.innerHTML = `<span>${item.valor}</span> ${btn}`; listaDepto.appendChild(li);
-            const opt = document.createElement('option'); opt.value = item.valor; opt.textContent = item.valor; selectDepto.appendChild(opt);
-        } else if (item.categoria === 'municipio') {
-            li.innerHTML = `<span>${item.valor} <small style='color:#777'>(${item.padre})</small></span> ${btn}`; listaMuni.appendChild(li);
-        }
+        if (item.categoria === 'institucion') { li.innerHTML = `<span>${item.valor}</span> ${btn}`; listaInst.appendChild(li); }
+        else if (item.categoria === 'departamento') { li.innerHTML = `<span>${item.valor}</span> ${btn}`; listaDepto.appendChild(li); const opt = document.createElement('option'); opt.value = item.valor; opt.textContent = item.valor; selectDepto.appendChild(opt); }
+        else if (item.categoria === 'municipio') { li.innerHTML = `<span>${item.valor} <small style='color:#777'>(${item.padre})</small></span> ${btn}`; listaMuni.appendChild(li); }
     });
-    if(deptoVal) selectDepto.value = deptoVal;
 }
 async function agregarItem(categoria) {
     let valor = "", padre = null;
     if (categoria === 'institucion') valor = document.getElementById('inputInstitucion').value;
     if (categoria === 'departamento') valor = document.getElementById('inputDepartamento').value;
-    if (categoria === 'municipio') { valor = document.getElementById('inputMunicipio').value; padre = document.getElementById('selectDeptoParaMuni').value; if (!padre) return Swal.fire('Alto', 'Selecciona un departamento', 'warning'); }
+    if (categoria === 'municipio') { valor = document.getElementById('inputMunicipio').value; padre = document.getElementById('selectDeptoParaMuni').value; if (!padre) return Swal.fire('Alto', 'Selecciona departamento', 'warning'); }
     if (!valor) return;
     await fetch('/api/listas', { method: 'POST', headers: { 'x-admin-password': passwordGuardada }, body: JSON.stringify({ categoria, valor, padre }) });
     if(categoria === 'institucion') document.getElementById('inputInstitucion').value = '';
@@ -64,153 +124,54 @@ async function agregarItem(categoria) {
     if(categoria === 'municipio') document.getElementById('inputMunicipio').value = '';
     cargarConfiguraciones();
 }
-async function borrarItem(id) {
-    if (confirm('¿Eliminar?')) { await fetch(`/api/listas?id=${id}`, { method: 'DELETE', headers: { 'x-admin-password': passwordGuardada } }); cargarConfiguraciones(); }
-}
-async function borrarRegistro(id) {
-    if (confirm('¿Seguro?')) { await fetch(`/api/delete-registro?id=${id}`, { headers: { 'x-admin-password': passwordGuardada } }); checkLogin(); }
-}
+async function borrarItem(id) { if (confirm('¿Eliminar?')) { await fetch(`/api/listas?id=${id}`, { method: 'DELETE', headers: { 'x-admin-password': passwordGuardada } }); cargarConfiguraciones(); } }
+async function borrarRegistro(id) { if (confirm('¿Seguro?')) { await fetch(`/api/delete-registro?id=${id}`, { headers: { 'x-admin-password': passwordGuardada } }); checkLogin(); } }
 
-// =========================================================
-// NUEVA LÓGICA: TABLAS SEPARADAS Y EXCEL SEGMENTADO
-// =========================================================
-
+// --- TABLAS Y EXCEL ---
 function cargarRegistrosPorInstitucion(registros) {
-    const contenedor = document.getElementById('contenedorTablas');
-    contenedor.innerHTML = ''; // Limpiar todo
-
-    // 1. Obtener lista única de instituciones presentes en los registros
-    //    (Usamos Set para quitar duplicados)
+    const contenedor = document.getElementById('contenedorTablas'); contenedor.innerHTML = '';
     const instituciones = [...new Set(registros.map(r => r.institucion))].sort();
+    if (instituciones.length === 0) { contenedor.innerHTML = '<p style="text-align:center;">No hay registros.</p>'; return; }
 
-    if (instituciones.length === 0) {
-        contenedor.innerHTML = '<p style="text-align:center;">No hay registros guardados aún.</p>';
-        return;
-    }
-
-    // 2. Crear una tabla por cada institución
     instituciones.forEach(inst => {
-        // Filtramos solo los registros de ESTA institución
         const registrosInst = registros.filter(r => r.institucion === inst);
-
-        // Creamos la estructura HTML
-        const div = document.createElement('div');
-        div.className = 'tabla-institucion-container';
-
-        // Encabezado con Título y Botón Individual
+        const div = document.createElement('div'); div.className = 'tabla-institucion-container';
         div.innerHTML = `
-            <div class="header-institucion">
-                <h3 class="titulo-inst">${inst}</h3>
-                <button onclick="exportarExcelUnico('${inst}')" class="btn-excel">
-                    📥 Descargar Excel ${inst}
-                </button>
-            </div>
-            
+            <div class="header-institucion"><h3 class="titulo-inst">${inst}</h3><button onclick="exportarExcelUnico('${inst}')" class="btn-excel">📥 Excel ${inst}</button></div>
             <div style="overflow-x: auto;">
                 <table id="tabla-${inst.replace(/\s/g, '-')}" border="1" style="width: 100%; border-collapse: collapse;">
-                    <thead style="background: #f4f4f4;">
-                        <tr>
-                            <th style="padding:10px;">ID</th>
-                            <th style="padding:10px;">Nombre</th>
-                            <th style="padding:10px;">Puesto</th>
-                            <th style="padding:10px;">Unidad</th>
-                            <th style="padding:10px;">Ubicación</th>
-                            <th style="padding:10px;">Contacto</th>
-                            <th style="padding:10px;">Acciones</th>
-                        </tr>
-                    </thead>
+                    <thead style="background: #f4f4f4;"><tr><th style="padding:10px;">ID</th><th style="padding:10px;">Nombre</th><th style="padding:10px;">Puesto</th><th style="padding:10px;">Unidad</th><th style="padding:10px;">Ubicación</th><th style="padding:10px;">Contacto</th><th style="padding:10px;">Acciones</th></tr></thead>
                     <tbody>
-                        ${registrosInst.map(r => `
-                            <tr>
-                                <td style="padding:8px;">${r.id}</td>
-                                <td style="padding:8px;">${r.nombre_completo}</td>
-                                <td style="padding:8px;">${r.puesto}</td>
-                                <td style="padding:8px;">${r.unidad_direccion}</td>
-                                <td style="padding:8px;">${r.departamento} - ${r.municipio}</td>
-                                <td style="padding:8px;">${r.correo}<br>${r.celular}</td>
-                                <td style="padding:8px; text-align:center;">
-                                    <button onclick="borrarRegistro(${r.id})" style="background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">Borrar</button>
-                                </td>
-                            </tr>
-                        `).join('')}
+                        ${registrosInst.map(r => `<tr><td style="padding:8px;">${r.id}</td><td style="padding:8px;">${r.nombre_completo}</td><td style="padding:8px;">${r.puesto}</td><td style="padding:8px;">${r.unidad_direccion}</td><td style="padding:8px;">${r.departamento}${r.municipio ? ' - '+r.municipio : ''}</td><td style="padding:8px;">${r.correo}<br>${r.celular}</td><td style="padding:8px; text-align:center;"><button onclick="borrarRegistro(${r.id})" style="background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">Borrar</button></td></tr>`).join('')}
                     </tbody>
                 </table>
-            </div>
-        `;
+            </div>`;
         contenedor.appendChild(div);
     });
 }
 
-// --- EXPORTAR SOLO UNA INSTITUCIÓN ---
 function exportarExcelUnico(nombreInst) {
-    // Buscamos la tabla específica por ID
-    const tablaId = `tabla-${nombreInst.replace(/\s/g, '-')}`;
-    const tablaOriginal = document.getElementById(tablaId);
-    
-    if (!tablaOriginal) return;
-
-    // Clonamos para limpiar la columna de borrar
-    const tablaClonada = tablaOriginal.cloneNode(true);
-    limpiarUltimaColumna(tablaClonada);
-
-    const wb = XLSX.utils.table_to_book(tablaClonada, { sheet: "Datos" });
-    const fecha = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `Reporte-${nombreInst}-${fecha}.xlsx`);
+    const tabla = document.getElementById(`tabla-${nombreInst.replace(/\s/g, '-')}`);
+    if (!tabla) return;
+    const clon = tabla.cloneNode(true); limpiarUltimaColumna(clon);
+    const wb = XLSX.utils.table_to_book(clon, { sheet: "Datos" });
+    XLSX.writeFile(wb, `Reporte-${nombreInst}.xlsx`);
 }
 
-// --- EXPORTAR TODO (SEGMENTADO EN UN SOLO ARCHIVO) ---
 function exportarTodoGlobal() {
-    if (todosLosRegistros.length === 0) return Swal.fire('Aviso', 'No hay datos para exportar', 'info');
-
-    // Estructura manual para SheetJS (Array de Arrays)
-    // Esto nos permite controlar filas vacías y títulos
-    let datosExcel = [];
-    
+    if (todosLosRegistros.length === 0) return Swal.fire('Aviso', 'Sin datos', 'info');
+    let datos = [];
+    const headers = ["ID", "Nombre", "Puesto", "Unidad", "Departamento", "Municipio", "Correo", "Celular"];
     const instituciones = [...new Set(todosLosRegistros.map(r => r.institucion))].sort();
     
-    // Encabezados de columnas
-    const headers = ["ID", "Nombre", "Puesto", "Unidad/Dirección", "Departamento", "Municipio", "Correo", "Celular"];
-
     instituciones.forEach(inst => {
-        // TÍTULO DE SECCIÓN
-        datosExcel.push([`INSTITUCIÓN: ${inst.toUpperCase()}`]); 
-        
-        // ENCABEZADOS
-        datosExcel.push(headers);
-
-        // DATOS DE ESA INSTITUCIÓN
-        const registrosInst = todosLosRegistros.filter(r => r.institucion === inst);
-        registrosInst.forEach(r => {
-            datosExcel.push([
-                r.id,
-                r.nombre_completo,
-                r.puesto,
-                r.unidad_direccion,
-                r.departamento,
-                r.municipio,
-                r.correo,
-                r.celular
-            ]);
-        });
-
-        // FILAS VACÍAS PARA SEPARAR VISUALMENTE
-        datosExcel.push([]); 
-        datosExcel.push([]); 
+        datos.push([`INSTITUCIÓN: ${inst.toUpperCase()}`]); datos.push(headers);
+        todosLosRegistros.filter(r => r.institucion === inst).forEach(r => datos.push([r.id, r.nombre_completo, r.puesto, r.unidad_direccion, r.departamento, r.municipio, r.correo, r.celular]));
+        datos.push([]); datos.push([]);
     });
-
-    // Crear hoja desde el array
-    const ws = XLSX.utils.aoa_to_sheet(datosExcel);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Reporte Completo");
-
-    const fecha = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `Reporte-GLOBAL-${fecha}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datos), "Reporte Completo");
+    XLSX.writeFile(wb, `Reporte-GLOBAL-${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
-// Helper para limpiar botones antes de exportar
-function limpiarUltimaColumna(tabla) {
-    for (let i = 0; i < tabla.rows.length; i++) {
-        const row = tabla.rows[i];
-        if (row.cells.length > 0) row.deleteCell(row.cells.length - 1);
-    }
-}
+function limpiarUltimaColumna(tabla) { for (let i = 0; i < tabla.rows.length; i++) { const row = tabla.rows[i]; if (row.cells.length > 0) row.deleteCell(row.cells.length - 1); } }

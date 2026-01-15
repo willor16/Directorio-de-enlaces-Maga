@@ -6,6 +6,17 @@
     <title>Registro Mano a Mano</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Estilos para el Directorio Público */
+        .tabla-publica-container { margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .header-publico { background: var(--azul-gob, #005696); color: white; padding: 10px 15px; font-weight: bold; }
+        .btn-solicitar { background-color: #ffc107; color: #333; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; transition: 0.2s;}
+        .btn-solicitar:hover { background-color: #e0a800; transform: scale(1.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f9f9f9; color: #555; font-size: 0.9em; }
+        tr:hover { background-color: #f1f1f1; }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -68,8 +79,16 @@
             <button type="submit" class="btn-primary" id="btnGuardar">GUARDAR REGISTRO</button>
         </form>
         
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="admin.html" style="font-size: 12px; color: #999;">Admin</a>
+        <hr style="border: 0; border-top: 2px solid #eee; margin: 50px 0 30px 0;">
+        
+        <h2 style="text-align: center; color: #333; margin-bottom: 20px;">Directorio de Enlaces</h2>
+        
+        <div id="contenedorDirectorio">
+            <p style="text-align:center; color:#666;">Cargando directorio...</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/public/admin.html" style="font-size: 12px; color: #999; text-decoration: none;">Acceso Administrativo</a>
         </div>
     </div>
     

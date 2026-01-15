@@ -1,12 +1,13 @@
-// 1. CARGA INICIAL
 document.addEventListener('DOMContentLoaded', async () => {
+    // Cargas iniciales
     await cargarSelect('/api/listas?tipo=institucion', 'institucion');
     await cargarSelect('/api/listas?tipo=departamento', 'departamento');
-    // Aseguramos que el estado inicial sea correcto (municipio visible pero desactivado)
-    gestionarTerritorio(); 
+    gestionarTerritorio(); // Configurar estado inicial
+    cargarDirectorioPublico(); // Cargar la tabla pública
 });
 
-// Función auxiliar para llenar selects
+// --- LÓGICA DEL FORMULARIO ---
+
 async function cargarSelect(url, idElemento) {
     try {
         const res = await fetch(url);
@@ -19,36 +20,29 @@ async function cargarSelect(url, idElemento) {
             opt.innerText = item.valor;
             select.appendChild(opt);
         });
-    } catch (error) {
-        console.error("Error cargando lista:", error);
-    }
+    } catch (error) { console.error("Error cargando lista:", error); }
 }
 
-// 2. NUEVA FUNCIÓN: Gestionar visibilidad según Enlace Territorial
 window.gestionarTerritorio = function() {
     const tipo = document.getElementById('tipoEnlace').value;
     const divMunicipio = document.getElementById('divMunicipio');
     const selectMunicipio = document.getElementById('municipio');
 
     if (tipo === 'departamental') {
-        // OCULTAR MUNICIPIO
-        divMunicipio.style.display = 'none';       // Lo hace invisible
-        selectMunicipio.required = false;          // Ya no es obligatorio
-        selectMunicipio.value = "";                // Limpia el valor para que no se envíe basura
+        divMunicipio.style.display = 'none';
+        selectMunicipio.required = false;
+        selectMunicipio.value = "";
     } else {
-        // MOSTRAR MUNICIPIO (Caso "municipal" o por defecto)
-        divMunicipio.style.display = 'block';      // Lo hace visible
-        selectMunicipio.required = true;           // Vuelve a ser obligatorio
+        divMunicipio.style.display = 'block';
+        selectMunicipio.required = true;
     }
 };
 
-// 3. CARGA DE MUNICIPIOS
 window.cargarMunicipios = async function() {
     const deptoSelect = document.getElementById('departamento');
     const muniSelect = document.getElementById('municipio');
     const depto = deptoSelect.value;
 
-    // Solo cargamos si el campo es visible
     if (document.getElementById('divMunicipio').style.display === 'none') return;
 
     muniSelect.innerHTML = '<option value="">Cargando...</option>';
@@ -58,32 +52,22 @@ window.cargarMunicipios = async function() {
         try {
             const res = await fetch(`/api/listas?tipo=municipio&padre=${depto}`);
             const datos = await res.json();
-
             muniSelect.innerHTML = '<option value="" disabled selected>Seleccione...</option>';
             datos.forEach(item => {
                 const opt = document.createElement('option');
-                opt.value = item.valor;
-                opt.innerText = item.valor;
-                muniSelect.appendChild(opt);
+                opt.value = item.valor; opt.innerText = item.valor; muniSelect.appendChild(opt);
             });
             muniSelect.disabled = false;
-        } catch (err) {
-            console.error(err);
-            muniSelect.innerHTML = '<option value="">Error al cargar</option>';
-        }
+        } catch (err) { muniSelect.innerHTML = '<option value="">Error</option>'; }
     }
 };
 
-// 4. ENVÍO DEL FORMULARIO
 document.getElementById('registroForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('btnGuardar');
     const textoOriginal = btn.innerText;
-    
-    btn.innerText = "Guardando..."; 
-    btn.disabled = true;
+    btn.innerText = "Guardando..."; btn.disabled = true;
 
-    // Recogemos los datos (si municipio está oculto, enviará vacío "")
     const data = {
         institucion: document.getElementById('institucion').value,
         departamento: document.getElementById('departamento').value,
@@ -93,8 +77,6 @@ document.getElementById('registroForm').addEventListener('submit', async (e) => 
         unidad: document.getElementById('unidad').value,
         correo: document.getElementById('correo').value,
         celular: document.getElementById('celular').value,
-        // (Opcional) Si quisieras guardar qué tipo de enlace eligió, podrías agregarlo aquí, 
-        // pero por ahora lo dejamos solo como lógica visual como pediste.
     };
 
     try {
@@ -105,19 +87,114 @@ document.getElementById('registroForm').addEventListener('submit', async (e) => 
         });
         
         if (res.ok) {
-            Swal.fire('¡Éxito!', 'Registro guardado correctamente', 'success');
+            Swal.fire('¡Éxito!', 'Registro guardado.', 'success');
             document.getElementById('registroForm').reset();
-            // Restablecer estados visuales
             document.getElementById('municipio').disabled = true;
-            document.getElementById('divMunicipio').style.display = 'block'; // Volver a mostrar por defecto
-        } else {
-            Swal.fire('Error', 'No se pudo guardar', 'error');
-        }
-    } catch (err) {
-        console.error(err);
-        Swal.fire('Error', 'Error de conexión', 'error');
-    }
+            document.getElementById('divMunicipio').style.display = 'block';
+            cargarDirectorioPublico(); // Recargar la tabla pública
+        } else { Swal.fire('Error', 'No se pudo guardar', 'error'); }
+    } catch (err) { Swal.fire('Error', 'Error de conexión', 'error'); }
     
-    btn.innerText = textoOriginal; 
-    btn.disabled = false;
+    btn.innerText = textoOriginal; btn.disabled = false;
 });
+
+// --- LÓGICA DIRECTORIO PÚBLICO Y CORRECCIONES ---
+
+async function cargarDirectorioPublico() {
+    const contenedor = document.getElementById('contenedorDirectorio');
+    try {
+        const res = await fetch('/api/public-registros');
+        const json = await res.json();
+        const registros = json.data;
+
+        if (!registros || registros.length === 0) {
+            contenedor.innerHTML = '<p style="text-align:center;">No hay registros aún.</p>';
+            return;
+        }
+
+        contenedor.innerHTML = '';
+        const instituciones = [...new Set(registros.map(r => r.institucion))].sort();
+
+        instituciones.forEach(inst => {
+            const registrosInst = registros.filter(r => r.institucion === inst);
+            const div = document.createElement('div');
+            div.className = 'tabla-publica-container';
+            
+            div.innerHTML = `
+                <div class="header-publico">${inst}</div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Puesto / Unidad</th>
+                                <th>Ubicación</th>
+                                <th>Contacto</th>
+                                <th style="text-align:center;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${registrosInst.map(r => `
+                                <tr>
+                                    <td><strong>${r.nombre_completo}</strong></td>
+                                    <td>${r.puesto}<br><small style="color:#666">${r.unidad_direccion}</small></td>
+                                    <td>${r.departamento}${r.municipio ? `<br><small>${r.municipio}</small>` : ''}</td>
+                                    <td>${r.correo}<br>${r.celular}</td>
+                                    <td style="text-align:center;">
+                                        <button class="btn-solicitar" onclick='abrirModalCorreccion(${JSON.stringify(r)})'>
+                                            ✏️ Corregir
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            contenedor.appendChild(div);
+        });
+    } catch (error) { console.error(error); contenedor.innerHTML = 'Error cargando directorio.'; }
+}
+
+window.abrirModalCorreccion = async function(registro) {
+    const { value: formValues } = await Swal.fire({
+        title: 'Solicitar Corrección',
+        html: `
+            <p style="font-size:0.9em; margin-bottom:15px; color:#666;">Edita los datos incorrectos y envía la solicitud.</p>
+            <input id="swal-nombre" class="swal2-input" placeholder="Nombre" value="${registro.nombre_completo}">
+            <input id="swal-puesto" class="swal2-input" placeholder="Puesto" value="${registro.puesto}">
+            <input id="swal-unidad" class="swal2-input" placeholder="Unidad" value="${registro.unidad_direccion}">
+            <input id="swal-correo" class="swal2-input" placeholder="Correo" value="${registro.correo}">
+            <input id="swal-celular" class="swal2-input" placeholder="Celular" value="${registro.celular}">
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Enviar Solicitud',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            return {
+                nombre: document.getElementById('swal-nombre').value,
+                puesto: document.getElementById('swal-puesto').value,
+                unidad: document.getElementById('swal-unidad').value,
+                correo: document.getElementById('swal-correo').value,
+                celular: document.getElementById('swal-celular').value,
+                // Datos base no editables por usuario
+                institucion: registro.institucion,
+                departamento: registro.departamento,
+                municipio: registro.municipio
+            }
+        }
+    });
+
+    if (formValues) {
+        try {
+            const res = await fetch('/api/ediciones', {
+                method: 'POST',
+                body: JSON.stringify({ registro_id: registro.id, nuevos_datos: formValues })
+            });
+            
+            if(res.ok) Swal.fire('Enviado', 'El administrador revisará tu corrección.', 'success');
+            else Swal.fire('Error', 'No se pudo enviar.', 'error');
+        } catch(e) { Swal.fire('Error', 'Fallo de conexión.', 'error'); }
+    }
+};
