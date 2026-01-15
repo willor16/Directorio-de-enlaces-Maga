@@ -8,7 +8,7 @@ export default async function handler(request, response) {
     if (request.method === 'OPTIONS') return response.status(200).end();
 
     try {
-        // --- GET: OBTENER LISTAS ---
+        // --- GET: OBTENER LISTAS (Público) ---
         if (request.method === 'GET') {
             const { tipo, padre } = request.query;
 
@@ -18,26 +18,33 @@ export default async function handler(request, response) {
                 return response.status(200).json(rows);
             }
             
-            // 2. Si piden una categoría general (institucion, departamento)
+            // 2. Si piden una categoría general
             if (tipo) {
                 const { rows } = await sql`SELECT * FROM configuracion WHERE categoria = ${tipo} ORDER BY valor ASC;`;
                 return response.status(200).json(rows);
             }
 
-            // 3. Si no piden nada, devolvemos todo (para el admin)
+            // 3. Todo (para el admin)
             const { rows } = await sql`SELECT * FROM configuracion ORDER BY categoria, valor ASC;`;
             return response.status(200).json(rows);
         }
 
-        // --- SEGURIDAD: VERIFICAR PASSWORD PARA GUARDAR/BORRAR ---
+        // --- SEGURIDAD: VERIFICAR PASSWORD ---
         const password = request.headers['x-admin-password'];
-        if (password !== process.env.ADMIN_PASSWORD) {
+        
+        // CORRECCIÓN 1: Ponemos la contraseña fija aquí (debe coincidir con la de admin.js)
+        const passwordCorrecta = 'admin2026'; 
+
+        if (password !== passwordCorrecta) {
             return response.status(401).json({ error: 'Contraseña incorrecta' });
         }
 
         // --- POST: AGREGAR NUEVO ---
         if (request.method === 'POST') {
-            const body = JSON.parse(request.body);
+            // CORRECCIÓN 2: Vercel a veces ya entrega el body parseado.
+            // Esto evita errores si 'request.body' ya es un objeto.
+            const body = typeof request.body === 'string' ? JSON.parse(request.body) : request.body;
+            
             const { categoria, valor, padre } = body;
             
             await sql`INSERT INTO configuracion (categoria, valor, padre) VALUES (${categoria}, ${valor}, ${padre || null});`;
@@ -52,6 +59,7 @@ export default async function handler(request, response) {
         }
 
     } catch (error) {
+        console.error(error);
         return response.status(500).json({ error: error.message });
     }
 }
