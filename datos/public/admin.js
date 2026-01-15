@@ -1,25 +1,38 @@
 let passwordGuardada = "";
 let todosLosRegistros = [];
 
-// --- LOGIN ---
+// ==========================================
+// 1. SISTEMA DE LOGIN
+// ==========================================
 async function checkLogin() {
     const pass = document.getElementById('passwordInput').value;
-    const res = await fetch('/api/get-registros', { headers: { 'x-admin-password': pass } });
+    
+    // Verificamos la contraseña contra el backend
+    const res = await fetch('/api/get-registros', { 
+        headers: { 'x-admin-password': pass } 
+    });
     
     if (res.status === 200) {
         passwordGuardada = pass;
-        // Ocultar login, mostrar dashboard
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('btnBell').style.display = 'block'; // Mostrar campanita
         
+        // Ocultar pantalla de login
+        document.getElementById('loginScreen').style.display = 'none';
+        
+        // Mostrar el panel de control (Dashboard)
+        document.getElementById('dashboard').style.display = 'block';
+        
+        // Mostrar la campanita de notificaciones
+        document.getElementById('btnBell').style.display = 'block'; 
+        
+        // Guardar los datos en memoria
         const json = await res.json();
         todosLosRegistros = json.data;
         
-        // Cargar datos
+        // Inicializar las vistas
         cargarRegistrosPorInstitucion(todosLosRegistros);
         cargarConfiguraciones();
         verificarNotificaciones();
+        
     } else {
         Swal.fire('Error', 'Contraseña incorrecta', 'error');
     }
@@ -31,10 +44,15 @@ function cerrarSesion() {
     window.location.href = "/";
 }
 
-// --- NOTIFICACIONES Y SOLICITUDES ---
+// ==========================================
+// 2. SISTEMA DE NOTIFICACIONES Y EDICIONES
+// ==========================================
 async function verificarNotificaciones() {
     try {
-        const res = await fetch('/api/ediciones', { method: 'GET', headers: { 'x-admin-password': passwordGuardada } });
+        const res = await fetch('/api/ediciones', { 
+            method: 'GET', 
+            headers: { 'x-admin-password': passwordGuardada } 
+        });
         const solicitudes = await res.json();
         const btnBell = document.getElementById('btnBell');
         
@@ -43,17 +61,19 @@ async function verificarNotificaciones() {
         } else {
             btnBell.classList.remove('notificacion-activa');
         }
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+        console.error(e); 
+    }
 }
 
-// Función global para el botón de la campanita
+// Abrir/Cerrar barra lateral
 window.toggleSidebar = function() {
     const sb = document.getElementById('sidebarSolicitudes');
     if (sb.style.right === '0px') {
         sb.style.right = '-400px';
     } else {
-        sb.style.right = '0px';
-        cargarSolicitudesPendientes();
+        sb.style.right = '0px'; 
+        cargarSolicitudesPendientes(); 
     }
 }
 
@@ -64,10 +84,13 @@ async function cargarSolicitudesPendientes() {
     if(!passwordGuardada) return;
 
     try {
-        const res = await fetch('/api/ediciones', { method: 'GET', headers: { 'x-admin-password': passwordGuardada } });
+        const res = await fetch('/api/ediciones', { 
+            method: 'GET', 
+            headers: { 'x-admin-password': passwordGuardada } 
+        });
         const solicitudes = await res.json();
         
-        // Actualizar estado campanita
+        // Actualizar el punto rojo de la campanita
         const btnBell = document.getElementById('btnBell');
         if (solicitudes.length > 0) btnBell.classList.add('notificacion-activa');
         else btnBell.classList.remove('notificacion-activa');
@@ -78,11 +101,12 @@ async function cargarSolicitudesPendientes() {
         }
 
         contenedor.innerHTML = '';
+        
         solicitudes.forEach(sol => {
             const nuevos = sol.nuevos_datos;
-            const original = sol; // En una versión avanzada, podrías comparar con el registro original
-
-            // Detectar cambios clave para mostrar resumen
+            const original = sol; 
+            
+            // Detectar qué cambió para mostrarlo
             const cambioInst = nuevos.institucion !== original.institucion ? `Inst: <b>${nuevos.institucion}</b><br>` : '';
             const cambioUbi = (nuevos.departamento !== original.departamento || nuevos.municipio !== original.municipio) ? `Ubi: <b>${nuevos.departamento}-${nuevos.municipio}</b><br>` : '';
 
@@ -106,43 +130,42 @@ async function cargarSolicitudesPendientes() {
             `;
             contenedor.appendChild(card);
         });
-    } catch (e) {
-        contenedor.innerHTML = 'Error cargando solicitudes.';
+    } catch (e) { 
+        contenedor.innerHTML = 'Error cargando solicitudes.'; 
     }
 }
 
 async function aprobarEdicion(solicitud) {
     if(!confirm('¿Estás seguro de aprobar estos cambios?')) return;
-
+    
     try {
         const res = await fetch('/api/ediciones', {
             method: 'PUT',
             headers: { 
-                'x-admin-password': passwordGuardada,
-                'Content-Type': 'application/json'
+                'x-admin-password': passwordGuardada, 
+                'Content-Type': 'application/json' 
             },
-            body: JSON.stringify({
-                solicitud_id: solicitud.solicitud_id,
-                registro_id: solicitud.id, // El ID del registro original
-                datos_finales: solicitud.nuevos_datos
+            body: JSON.stringify({ 
+                solicitud_id: solicitud.solicitud_id, 
+                registro_id: solicitud.id, 
+                datos_finales: solicitud.nuevos_datos 
             })
         });
-
-        if(res.ok) {
-            Swal.fire('Aprobado', 'El registro ha sido actualizado.', 'success');
-            cargarSolicitudesPendientes(); // Recargar lista lateral
-            checkLogin(); // Recargar tabla principal
-        } else {
-            Swal.fire('Error', 'No se pudo actualizar.', 'error');
+        
+        if(res.ok) { 
+            Swal.fire('Aprobado', 'Registro actualizado correctamente.', 'success'); 
+            cargarSolicitudesPendientes(); 
+            checkLogin(); // Recargar la tabla principal
+        } else { 
+            Swal.fire('Error', 'No se pudo actualizar.', 'error'); 
         }
-    } catch(e) {
-        console.error(e);
-        Swal.fire('Error', 'Error de conexión', 'error');
+    } catch(e) { 
+        Swal.fire('Error', 'Error de conexión', 'error'); 
     }
 }
 
 async function rechazarEdicion(id) {
-    if(!confirm('¿Rechazar y eliminar esta solicitud?')) return;
+    if(!confirm('¿Rechazar solicitud?')) return;
     
     await fetch(`/api/ediciones?solicitud_id=${id}`, { 
         method: 'DELETE', 
@@ -152,9 +175,10 @@ async function rechazarEdicion(id) {
     cargarSolicitudesPendientes();
 }
 
-// --- EXCEL SEPARADO (ESTO SE MANTIENE IGUAL: Columnas Originales) ---
+// ==========================================
+// 3. EXPORTACIÓN A EXCEL (Lógica Intacta)
+// ==========================================
 function exportarExcelUnico(inst) {
-    // Encabezados originales para Excel
     const data = [["ID", "Nombre", "Puesto", "Unidad", "Tipo Enlace", "Departamento", "Municipio", "Correo", "Celular"]];
     
     todosLosRegistros.filter(r => r.institucion === inst).forEach(r => {
@@ -171,50 +195,41 @@ function exportarExcelUnico(inst) {
         ]);
     });
     
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, ws, "Datos");
+    const wb = XLSX.utils.book_new(); 
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), "Datos");
     XLSX.writeFile(wb, `Reporte-${inst}.xlsx`);
 }
 
 function exportarTodoGlobal() {
-    if (todosLosRegistros.length === 0) return Swal.fire('Aviso', 'No hay datos para exportar', 'info');
+    if (todosLosRegistros.length === 0) return Swal.fire('Aviso', 'No hay datos', 'info');
     
-    let datos = [];
+    let datos = []; 
     const headers = ["ID", "Nombre", "Puesto", "Unidad", "Tipo Enlace", "Departamento", "Municipio", "Correo", "Celular"];
-    
     const instituciones = [...new Set(todosLosRegistros.map(r => r.institucion))].sort();
     
     instituciones.forEach(inst => {
-        datos.push([`INSTITUCIÓN: ${inst.toUpperCase()}`]);
+        datos.push([`INSTITUCIÓN: ${inst.toUpperCase()}`]); 
         datos.push(headers);
         
-        const registrosInst = todosLosRegistros.filter(r => r.institucion === inst);
-        registrosInst.forEach(r => {
+        todosLosRegistros.filter(r => r.institucion === inst).forEach(r => 
             datos.push([
-                r.id, 
-                r.nombre_completo, 
-                r.puesto, 
-                r.unidad_direccion, 
-                r.tipo_enlace,
-                r.departamento, 
-                r.municipio, 
-                r.correo, 
-                r.celular
-            ]);
-        });
+                r.id, r.nombre_completo, r.puesto, r.unidad_direccion, 
+                r.tipo_enlace, r.departamento, r.municipio, r.correo, r.celular
+            ])
+        );
         
-        datos.push([]); // Espacio vacío
+        datos.push([]); 
         datos.push([]);
     });
     
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(datos);
-    XLSX.utils.book_append_sheet(wb, ws, "Reporte Completo");
+    const wb = XLSX.utils.book_new(); 
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datos), "Reporte Completo");
     XLSX.writeFile(wb, `Reporte-GLOBAL-${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
-// --- GESTIÓN DE LISTAS (INSTITUCIONES, DEPTOS, MUNIS) ---
+// ==========================================
+// 4. GESTIÓN DE LISTAS (AQUÍ ESTÁ EL ARREGLO VISUAL)
+// ==========================================
 async function cargarConfiguraciones() {
     const res = await fetch('/api/listas');
     const datos = await res.json();
@@ -224,51 +239,69 @@ async function cargarConfiguraciones() {
     const listaMuni = document.getElementById('listaMunicipios');
     const selectDepto = document.getElementById('selectDeptoParaMuni');
     
-    listaInst.innerHTML = '';
-    listaDepto.innerHTML = '';
+    // Limpiar listas
+    listaInst.innerHTML = ''; 
+    listaDepto.innerHTML = ''; 
     listaMuni.innerHTML = '';
     selectDepto.innerHTML = '<option value="" disabled selected>Selecciona Depto...</option>';
     
     datos.forEach(item => {
-        const btn = `<button onclick="borrarItem(${item.id})" style="color:red;border:none;background:none;cursor:pointer;font-weight:bold;float:right;">X</button>`;
+        // --- AQUÍ ESTÁ EL CAMBIO PARA ALINEAR LAS "X" ---
         const li = document.createElement('li');
         
+        // Usamos Flexbox para separar Texto <----> Botón
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between'; // Esto empuja los elementos a los extremos
+        li.style.alignItems = 'center'; // Esto los centra verticalmente
+        li.style.padding = '8px 0';
+        li.style.borderBottom = '1px solid #f0f0f0';
+        
+        // Estilo del botón de borrar
+        const btnBorrar = `<button onclick="borrarItem(${item.id})" style="color:#dc3545; border:none; background:none; cursor:pointer; font-weight:bold; font-size:1.2em; padding:0 10px;">&times;</button>`;
+        
         if (item.categoria === 'institucion') {
-            li.innerHTML = `<span>${item.valor}</span> ${btn}`;
+            li.innerHTML = `<span style="word-break: break-word;">${item.valor}</span> ${btnBorrar}`;
             listaInst.appendChild(li);
-        } else if (item.categoria === 'departamento') {
-            li.innerHTML = `<span>${item.valor}</span> ${btn}`;
+        } 
+        else if (item.categoria === 'departamento') {
+            li.innerHTML = `<span style="word-break: break-word;">${item.valor}</span> ${btnBorrar}`;
             listaDepto.appendChild(li);
-            // Llenar select
-            const opt = document.createElement('option');
-            opt.value = item.valor;
-            opt.textContent = item.valor;
+            
+            // Llenar el select
+            const opt = document.createElement('option'); 
+            opt.value = item.valor; 
+            opt.textContent = item.valor; 
             selectDepto.appendChild(opt);
-        } else if (item.categoria === 'municipio') {
-            li.innerHTML = `<span>${item.valor} <small style='color:#777'>(${item.padre})</small></span> ${btn}`;
+        } 
+        else if (item.categoria === 'municipio') {
+            li.innerHTML = `
+                <div style="display:flex; flex-direction:column;">
+                    <span style="word-break: break-word;">${item.valor}</span>
+                    <small style='color:#777; font-size:0.8em;'>(${item.padre})</small>
+                </div> 
+                ${btnBorrar}`;
             listaMuni.appendChild(li);
         }
     });
 }
 
 async function agregarItem(categoria) {
-    let valor = "";
-    let padre = null;
+    let valor = "", padre = null;
     
     if (categoria === 'institucion') valor = document.getElementById('inputInstitucion').value;
     if (categoria === 'departamento') valor = document.getElementById('inputDepartamento').value;
-    if (categoria === 'municipio') {
-        valor = document.getElementById('inputMunicipio').value;
-        padre = document.getElementById('selectDeptoParaMuni').value;
-        if (!padre) return Swal.fire('Alto', 'Selecciona a qué departamento pertenece', 'warning');
+    if (categoria === 'municipio') { 
+        valor = document.getElementById('inputMunicipio').value; 
+        padre = document.getElementById('selectDeptoParaMuni').value; 
+        if (!padre) return Swal.fire('Alto', 'Selecciona a qué departamento pertenece', 'warning'); 
     }
     
     if (!valor) return;
     
-    await fetch('/api/listas', {
-        method: 'POST',
-        headers: { 'x-admin-password': passwordGuardada },
-        body: JSON.stringify({ categoria, valor, padre })
+    await fetch('/api/listas', { 
+        method: 'POST', 
+        headers: { 'x-admin-password': passwordGuardada }, 
+        body: JSON.stringify({ categoria, valor, padre }) 
     });
     
     // Limpiar inputs
@@ -280,40 +313,42 @@ async function agregarItem(categoria) {
 }
 
 async function borrarItem(id) {
-    if (confirm('¿Eliminar este elemento de la lista?')) {
+    if (confirm('¿Eliminar este elemento de la lista?')) { 
         await fetch(`/api/listas?id=${id}`, { 
-            method: 'DELETE',
-            headers: { 'x-admin-password': passwordGuardada }
-        });
-        cargarConfiguraciones();
+            method: 'DELETE', 
+            headers: { 'x-admin-password': passwordGuardada } 
+        }); 
+        cargarConfiguraciones(); 
     }
 }
 
 async function borrarRegistro(id) {
-    if (confirm('¿Seguro que deseas borrar este registro permanentemente?')) {
-        await fetch(`/api/delete-registro?id=${id}`, {
-            headers: { 'x-admin-password': passwordGuardada }
-        });
-        checkLogin(); // Recargar tabla
+    if (confirm('¿Borrar registro permanentemente?')) { 
+        await fetch(`/api/delete-registro?id=${id}`, { 
+            headers: { 'x-admin-password': passwordGuardada } 
+        }); 
+        checkLogin(); 
     }
 }
 
-// --- CARGA DE TABLAS VISUALES (MODIFICADO: FUSIÓN DE COLUMNAS) ---
+// ==========================================
+// 5. CARGA DE TABLAS VISUALES (Con Diseño Fusionado)
+// ==========================================
 function cargarRegistrosPorInstitucion(registros) {
-    const contenedor = document.getElementById('contenedorTablas');
+    const contenedor = document.getElementById('contenedorTablas'); 
     contenedor.innerHTML = '';
     
     const instituciones = [...new Set(registros.map(r => r.institucion))].sort();
     
-    if (instituciones.length === 0) {
-        contenedor.innerHTML = '<p style="text-align:center;">No hay registros aún.</p>';
-        return;
+    if (instituciones.length === 0) { 
+        contenedor.innerHTML = '<p style="text-align:center;">No hay registros aún.</p>'; 
+        return; 
     }
 
     instituciones.forEach(inst => {
         const registrosInst = registros.filter(r => r.institucion === inst);
         
-        const details = document.createElement('details');
+        const details = document.createElement('details'); 
         details.className = 'lista-desplegable';
         
         details.innerHTML = `
@@ -329,14 +364,10 @@ function cargarRegistrosPorInstitucion(registros) {
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Puesto</th>
-                            
                             <th>Unidad y Ubicación</th>
-                            
                             <th>Tipo Enlace</th>
-                            
                             <th>Correo</th>
                             <th>Celular</th>
-                            
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -362,12 +393,10 @@ function cargarRegistrosPorInstitucion(registros) {
                             <td style="text-align:center;">
                                 <button onclick="borrarRegistro(${r.id})" style="background:#dc3545; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.8em;">Borrar</button>
                             </td>
-                        </tr>
-                    `).join('')}
+                        </tr>`).join('')}
                     </tbody>
                 </table>
-            </div>
-        `;
+            </div>`;
         contenedor.appendChild(details);
     });
 }
