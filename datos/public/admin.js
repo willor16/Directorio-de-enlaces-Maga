@@ -7,28 +7,19 @@ let todosLosRegistros = [];
 async function checkLogin() {
     const pass = document.getElementById('passwordInput').value;
     
-    // Verificamos la contraseña contra el backend
     const res = await fetch('/api/get-registros', { 
         headers: { 'x-admin-password': pass } 
     });
     
     if (res.status === 200) {
         passwordGuardada = pass;
-        
-        // Ocultar pantalla de login
         document.getElementById('loginScreen').style.display = 'none';
-        
-        // Mostrar el panel de control (Dashboard)
         document.getElementById('dashboard').style.display = 'block';
-        
-        // Mostrar la campanita de notificaciones
         document.getElementById('btnBell').style.display = 'block'; 
         
-        // Guardar los datos en memoria
         const json = await res.json();
         todosLosRegistros = json.data;
         
-        // Inicializar las vistas
         cargarRegistrosPorInstitucion(todosLosRegistros);
         cargarConfiguraciones();
         verificarNotificaciones();
@@ -66,7 +57,6 @@ async function verificarNotificaciones() {
     }
 }
 
-// Abrir/Cerrar barra lateral
 window.toggleSidebar = function() {
     const sb = document.getElementById('sidebarSolicitudes');
     if (sb.style.right === '0px') {
@@ -90,7 +80,6 @@ async function cargarSolicitudesPendientes() {
         });
         const solicitudes = await res.json();
         
-        // Actualizar el punto rojo de la campanita
         const btnBell = document.getElementById('btnBell');
         if (solicitudes.length > 0) btnBell.classList.add('notificacion-activa');
         else btnBell.classList.remove('notificacion-activa');
@@ -106,7 +95,6 @@ async function cargarSolicitudesPendientes() {
             const nuevos = sol.nuevos_datos;
             const original = sol; 
             
-            // Detectar qué cambió para mostrarlo
             const cambioInst = nuevos.institucion !== original.institucion ? `Inst: <b>${nuevos.institucion}</b><br>` : '';
             const cambioUbi = (nuevos.departamento !== original.departamento || nuevos.municipio !== original.municipio) ? `Ubi: <b>${nuevos.departamento}-${nuevos.municipio}</b><br>` : '';
 
@@ -155,7 +143,7 @@ async function aprobarEdicion(solicitud) {
         if(res.ok) { 
             Swal.fire('Aprobado', 'Registro actualizado correctamente.', 'success'); 
             cargarSolicitudesPendientes(); 
-            checkLogin(); // Recargar la tabla principal
+            checkLogin(); 
         } else { 
             Swal.fire('Error', 'No se pudo actualizar.', 'error'); 
         }
@@ -228,7 +216,7 @@ function exportarTodoGlobal() {
 }
 
 // ==========================================
-// 4. GESTIÓN DE LISTAS (AQUÍ ESTÁ EL ARREGLO VISUAL)
+// 4. GESTIÓN DE LISTAS (Listas con "X" Ordenadas)
 // ==========================================
 async function cargarConfiguraciones() {
     const res = await fetch('/api/listas');
@@ -239,24 +227,21 @@ async function cargarConfiguraciones() {
     const listaMuni = document.getElementById('listaMunicipios');
     const selectDepto = document.getElementById('selectDeptoParaMuni');
     
-    // Limpiar listas
     listaInst.innerHTML = ''; 
     listaDepto.innerHTML = ''; 
     listaMuni.innerHTML = '';
     selectDepto.innerHTML = '<option value="" disabled selected>Selecciona Depto...</option>';
     
     datos.forEach(item => {
-        // --- AQUÍ ESTÁ EL CAMBIO PARA ALINEAR LAS "X" ---
         const li = document.createElement('li');
         
-        // Usamos Flexbox para separar Texto <----> Botón
+        // Flexbox para alinear Texto a la izquierda y X a la derecha
         li.style.display = 'flex';
-        li.style.justifyContent = 'space-between'; // Esto empuja los elementos a los extremos
-        li.style.alignItems = 'center'; // Esto los centra verticalmente
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
         li.style.padding = '8px 0';
         li.style.borderBottom = '1px solid #f0f0f0';
         
-        // Estilo del botón de borrar
         const btnBorrar = `<button onclick="borrarItem(${item.id})" style="color:#dc3545; border:none; background:none; cursor:pointer; font-weight:bold; font-size:1.2em; padding:0 10px;">&times;</button>`;
         
         if (item.categoria === 'institucion') {
@@ -267,7 +252,6 @@ async function cargarConfiguraciones() {
             li.innerHTML = `<span style="word-break: break-word;">${item.valor}</span> ${btnBorrar}`;
             listaDepto.appendChild(li);
             
-            // Llenar el select
             const opt = document.createElement('option'); 
             opt.value = item.valor; 
             opt.textContent = item.valor; 
@@ -332,7 +316,7 @@ async function borrarRegistro(id) {
 }
 
 // ==========================================
-// 5. CARGA DE TABLAS VISUALES (Con Diseño Fusionado)
+// 5. CARGA DE TABLAS VISUALES (CORREGIDO)
 // ==========================================
 function cargarRegistrosPorInstitucion(registros) {
     const contenedor = document.getElementById('contenedorTablas'); 
@@ -364,7 +348,10 @@ function cargarRegistrosPorInstitucion(registros) {
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Puesto</th>
-                            <th>Unidad y Ubicación</th>
+                            
+                            <th>Unidad / Dirección</th>
+                            <th>Ubicación</th>
+                            
                             <th>Tipo Enlace</th>
                             <th>Correo</th>
                             <th>Celular</th>
@@ -378,15 +365,17 @@ function cargarRegistrosPorInstitucion(registros) {
                             <td style="font-weight:600; color:#333;">${r.nombre_completo}</td>
                             <td>${r.puesto}</td>
                             
+                            <td style="font-weight:bold; color:#005696;">
+                                ${r.unidad_direccion}
+                            </td>
+                            
                             <td>
-                                <div style="font-weight:bold; color:#005696;">${r.unidad_direccion}</div>
-                                <div style="font-size:0.85em; color:#666; margin-top:4px;">
+                                <div style="font-size:0.9em; color:#444;">
                                     📍 ${r.departamento}${r.municipio ? ' - '+r.municipio : ''}
                                 </div>
                             </td>
                             
                             <td><span class="badge">${r.tipo_enlace || '-'}</span></td>
-                            
                             <td>${r.correo}</td>
                             <td>${r.celular}</td>
                             
