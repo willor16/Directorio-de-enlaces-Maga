@@ -2,9 +2,8 @@
     --azul-gob: #005696;
     --azul-profundo: #002a4d;
     --gradiente-azul: linear-gradient(135deg, #005696, #002a4d);
-    --gradiente-verde: linear-gradient(135deg, #28a745, #218838);
+    --gradiente-verde: linear-gradient(135deg, #28a745, #1e7e34); /* Verde fuerte */
     --gradiente-amarillo: linear-gradient(135deg, #ffc107, #ffca2c);
-    --gradiente-rojo: linear-gradient(135deg, #dc3545, #c82333);
     --sombra-fuerte: 0 15px 35px rgba(0, 42, 77, 0.15);
     --sombra-interna: inset 0 2px 4px rgba(0,0,0,0.06);
     --blanco-vidrio: rgba(255, 255, 255, 0.95);
@@ -13,7 +12,6 @@
 
 body {
     font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
-    /* Fondo con más personalidad y movimiento */
     background: linear-gradient(-45deg, #eef2f3, #e6efff, #dcecfc, #f5f7fa);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
@@ -29,7 +27,7 @@ body {
     100% { background-position: 0% 50%; }
 }
 
-/* --- CONTENEDOR PRINCIPAL CON EFECTO 3D --- */
+/* --- CONTENEDOR PRINCIPAL --- */
 .container {
     max-width: 900px;
     margin: 30px auto;
@@ -45,7 +43,7 @@ body {
 
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- HEADER Y TEXTOS --- */
+/* --- HEADER --- */
 .header-area { display: flex; justify-content: center; align-items: center; gap: 30px; margin-bottom: 30px; }
 .header-area img { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); transition: transform 0.3s; }
 .header-area img:hover { transform: scale(1.1) rotate(2deg); }
@@ -72,251 +70,135 @@ h1 {
     letter-spacing: 2px;
 }
 
-/* --- FORMULARIOS (PROFUNDIDAD Y DINAMISMO) --- */
+/* --- FORMULARIOS --- */
 .form-group { margin-bottom: 25px; position: relative; }
 
 label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 700;
-    color: var(--azul-gob);
-    font-size: 0.9em;
-    padding-left: 5px; /* Pequeño detalle visual */
+    display: block; margin-bottom: 8px; font-weight: 700; color: var(--azul-gob); font-size: 0.9em; padding-left: 5px;
 }
 
 input, select {
-    width: 100%;
-    padding: 15px 20px;
-    border: 2px solid transparent;
-    border-radius: 12px;
-    font-size: 16px;
-    background: #f0f4f8; /* Fondo gris muy suave */
-    box-shadow: var(--sombra-interna);
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-    color: #333;
+    width: 100%; padding: 15px 20px; border: 2px solid transparent; border-radius: 12px;
+    font-size: 16px; background: #f0f4f8; box-shadow: var(--sombra-interna);
+    transition: all 0.3s ease; box-sizing: border-box; color: #333;
 }
 
-/* Efecto al enfocar: borde de color y sombra brillante */
 input:focus, select:focus {
-    background: #fff;
-    border-color: #005696;
-    box-shadow: 0 0 0 5px rgba(0, 86, 150, 0.15);
-    outline: none;
-    transform: translateY(-2px);
+    background: #fff; border-color: #005696; box-shadow: 0 0 0 5px rgba(0, 86, 150, 0.15);
+    outline: none; transform: translateY(-2px);
 }
 
-/* --- BOTÓN PRINCIPAL (HERO BUTTON) --- */
+/* --- BOTÓN PRINCIPAL (Guardar) --- */
 .btn-primary {
     background: var(--gradiente-azul);
-    color: white;
-    border: none;
-    padding: 18px;
-    width: 100%;
-    font-size: 18px;
-    font-weight: 800;
-    border-radius: 15px;
-    cursor: pointer;
-    margin-top: 30px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 10px 20px rgba(0, 86, 150, 0.3);
+    color: white; border: none; padding: 18px; width: 100%; font-size: 18px; font-weight: 800;
+    border-radius: 15px; cursor: pointer; margin-top: 30px; text-transform: uppercase; letter-spacing: 1px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 20px rgba(0, 86, 150, 0.3);
 }
+.btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 30px rgba(0, 86, 150, 0.4); }
 
-.btn-primary:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 15px 30px rgba(0, 86, 150, 0.4);
-}
-
-/* --- LOGIN ADMIN (DISEÑO PREMIUM) --- */
+/* --- LOGIN ADMIN --- */
 .login-card {
-    max-width: 420px;
-    margin: 80px auto;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.85); /* Más vidrio */
-    border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); /* Sombra muy profunda */
-    text-align: center;
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    position: relative;
-    overflow: hidden;
-    animation: popIn 0.5s ease-out;
+    max-width: 420px; margin: 80px auto; padding: 40px;
+    background: rgba(255, 255, 255, 0.85); border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); text-align: center;
+    backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.6);
+    position: relative; overflow: hidden; animation: popIn 0.5s ease-out;
 }
+@keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: var(--gradiente-azul); }
+.login-card h2 { color: var(--azul-profundo); font-size: 1.8em; margin-bottom: 30px; }
 
-@keyframes popIn {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-/* Barra decorativa arriba del login */
-.login-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 6px;
-    background: var(--gradiente-azul);
-}
-
-.login-card h2 {
-    color: var(--azul-profundo);
-    font-size: 1.8em;
-    margin-bottom: 30px;
-}
-
-/* --- DASHBOARD ADMIN (WIDGETS Y TARJETAS) --- */
-/* Header del Dashboard */
+/* --- DASHBOARD ADMIN --- */
+/* Header Azul del Dashboard */
 #dashboard > div:first-child {
-    background: var(--gradiente-azul) !important; /* Sobreescribimos el blanco */
-    color: white;
-    padding: 20px 25px !important;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0, 42, 77, 0.3);
-    margin-bottom: 30px;
+    background: var(--gradiente-azul) !important;
+    color: white; padding: 20px 25px !important; border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 42, 77, 0.3); margin-bottom: 30px;
 }
 #dashboard h2 { color: white !important; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-/* BOTÓN EXPORTAR GLOBAL (GRANDE Y LLAMATIVO) */
+/* *** BOTÓN EXPORTAR EXCEL (AHORA SÍ VERDE Y POTENTE) *** */
 .btn-excel {
-    background: var(--gradiente-verde);
-    color: white;
+    background: var(--gradiente-verde) !important; /* Forzamos el verde */
+    color: white !important;
     border: none;
-    padding: 12px 25px;
-    border-radius: 50px; /* Redondo */
+    padding: 12px 30px; /* Más ancho */
+    border-radius: 50px;
     cursor: pointer;
-    font-weight: 700;
-    font-size: 1em;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
-    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: 800;
+    font-size: 0.95em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4); /* Resplandor verde */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex; align-items: center; gap: 8px;
 }
 .btn-excel:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.6);
+    transform: translateY(-4px); /* Se levanta más */
+    background: linear-gradient(135deg, #34ce57, #28a745) !important; /* Más brillante al hover */
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.6);
 }
 
-/* CAJAS DE GESTIÓN (Instituciones, Deptos...) */
+/* Widgets de Gestión */
 .gestion-box {
-    background: white;
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    border: 1px solid #eee;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    background: white; padding: 25px; border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05); border: 1px solid #eee;
+    transition: all 0.3s ease; position: relative; overflow: hidden;
 }
-
-.gestion-box:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-}
-
-/* Tiras de color para diferenciar cajas */
-.gestion-box:nth-child(1) { border-top: 5px solid #005696; } /* Azul */
-.gestion-box:nth-child(2) { border-top: 5px solid #6f42c1; } /* Morado */
-.gestion-box:nth-child(3) { border-top: 5px solid #e83e8c; } /* Rosa */
-
+.gestion-box:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+.gestion-box:nth-child(1) { border-top: 5px solid #005696; }
+.gestion-box:nth-child(2) { border-top: 5px solid #6f42c1; }
+.gestion-box:nth-child(3) { border-top: 5px solid #e83e8c; }
 .gestion-box h3 { margin-top: 0; color: #333; font-size: 1.3em; }
-
-/* Botón de Agregar (+) en Admin */
 .gestion-box button {
-    background: var(--azul-gob);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    transition: 0.2s;
+    background: var(--azul-gob); color: white; border: none; border-radius: 8px;
+    font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s;
 }
 .gestion-box button:hover { background: var(--azul-profundo); transform: scale(1.1); }
 
-/* --- TABLAS (MODERNAS Y LIMPIAS) --- */
-details.lista-desplegable, 
-.tabla-institucion-container {
-    margin-bottom: 25px;
-    border-radius: 15px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    border: 1px solid rgba(0,0,0,0.05);
+/* --- TABLAS --- */
+details.lista-desplegable, .tabla-institucion-container {
+    margin-bottom: 25px; border-radius: 15px; overflow: hidden; background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);
 }
-
 summary {
-    background: white;
-    padding: 20px 25px;
-    color: var(--azul-profundo);
-    font-weight: 800;
-    font-size: 1.1em;
-    border-left: 6px solid var(--azul-gob); /* Acento izquierdo */
-    transition: background 0.3s;
+    background: white; padding: 20px 25px; color: var(--azul-profundo);
+    font-weight: 800; font-size: 1.1em; border-left: 6px solid var(--azul-gob); transition: background 0.3s;
 }
 summary:hover { background: #f8fbff; }
 summary::after { color: var(--azul-gob); font-size: 1.5em; font-weight: 900; }
 
 table { width: 100%; border-collapse: collapse; background: white; }
 th {
-    background: #f1f5f9;
-    color: var(--azul-profundo);
-    padding: 15px 20px;
-    text-transform: uppercase;
-    font-size: 0.8em;
-    letter-spacing: 1px;
-    border-bottom: 2px solid #e2e8f0;
+    background: #f1f5f9; color: var(--azul-profundo); padding: 15px 20px;
+    text-transform: uppercase; font-size: 0.8em; letter-spacing: 1px; border-bottom: 2px solid #e2e8f0;
 }
 td { padding: 15px 20px; border-bottom: 1px solid #f1f5f9; color: #555; vertical-align: middle; }
 tbody tr { transition: 0.2s; }
-tbody tr:hover { background-color: #f0f8ff; transform: scale(1.01); z-index: 10; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+tbody tr:hover {
+    background-color: #f0f8ff; transform: scale(1.01); z-index: 10; position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
 
-/* --- ELEMENTOS DE INTERFAZ --- */
+/* --- BADGES & BOTONES ACCIÓN --- */
 .badge {
-    background: var(--azul-claro);
-    color: var(--azul-profundo);
-    padding: 6px 12px;
-    border-radius: 30px;
-    font-weight: 800;
-    font-size: 0.75em;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    background: #e3f2fd; color: var(--azul-gob); padding: 5px 12px;
+    border-radius: 30px; font-weight: 800; font-size: 0.75em; letter-spacing: 0.5px; text-transform: uppercase;
 }
-
-/* Botón Actualizar Amarillo (Más profesional) */
 .btn-actualizar {
-    background: var(--gradiente-amarillo);
-    color: #554400;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 0.85em;
-    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
-    transition: 0.3s;
-    text-transform: uppercase;
+    background: var(--gradiente-amarillo); color: #554400; border: none; padding: 8px 20px;
+    border-radius: 50px; font-weight: 700; font-size: 0.85em; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3); transition: 0.3s; text-transform: uppercase;
 }
-.btn-actualizar:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(255, 193, 7, 0.5);
-    background: #ffdb6c;
-}
+.btn-actualizar:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 193, 7, 0.5); background: #ffdb6c; }
 
 /* Botón Admin Top (Verde) */
 .btn-admin-top {
-    position: absolute; top: 40px; right: 40px;
-    background: rgba(255,255,255,0.9);
-    color: #28a745;
-    padding: 10px 25px;
-    border-radius: 50px;
-    font-weight: 800;
-    text-decoration: none;
-    border: 2px solid #28a745;
-    transition: 0.3s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    position: absolute; top: 40px; right: 40px; background: rgba(255,255,255,0.9);
+    color: #28a745; padding: 10px 25px; border-radius: 50px; font-weight: 800;
+    text-decoration: none; border: 2px solid #28a745; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-.btn-admin-top:hover {
-    background: #28a745; color: white;
-    transform: translateY(-3px); box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
-}
+.btn-admin-top:hover { background: #28a745; color: white; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4); }
 
 /* Campanita */
 #btnBell {
@@ -335,9 +217,7 @@ tbody tr:hover { background-color: #f0f8ff; transform: scale(1.01); z-index: 10;
     100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
 }
 
-/* --- RESPONSIVO --- */
 @media (max-width: 600px) {
-    .container { padding: 30px 20px; }
-    h1 { font-size: 1.8em; }
+    .container { padding: 30px 20px; } h1 { font-size: 1.8em; }
     .btn-admin-top { position: relative; top: 0; right: 0; display: table; margin: 0 auto 20px auto; }
 }
