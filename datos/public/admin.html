@@ -2,84 +2,92 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Mano a Mano</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        /* Estilos simples para las cajitas de gestión */
-        .gestion-box { background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd; }
-        .gestion-box h3 { margin-top: 0; color: #333; }
-        .lista-items li { margin-bottom: 5px; border-bottom: 1px solid #eee; padding: 5px; display: flex; justify-content: space-between; }
-    </style>
 </head>
 <body>
 
-    <div id="loginScreen" style="text-align: center; margin-top: 50px;">
-        <h2>Acceso Administrativo</h2>
-        <input type="password" id="passwordInput" placeholder="Contraseña">
-        <button onclick="checkLogin()">Entrar</button>
-    </div>
-
-    <div id="dashboard" style="display: none; max-width: 1200px; margin: 0 auto; padding: 20px;">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Panel de Control</h2>
-            <button onclick="cerrarSesion()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px;">
-                Cerrar Sesión
-            </button>
+    <div class="container">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px;">
+            <img src="logo1.jpeg" alt="Logo" style="max-height: 80px;">
+            <img src="logo2.jpeg" alt="Logo" style="max-height: 80px;">
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        <div id="loginScreen" style="text-align: center; margin-top: 20px;">
+            <h2>Acceso Administrativo</h2>
+            <p>Ingresa la contraseña para gestionar los datos.</p>
+            <input type="password" id="passwordInput" placeholder="Contraseña">
+            <button onclick="checkLogin()">Ingresar</button>
+        </div>
+
+        <div id="dashboard" style="display: none;">
             
-            <div class="gestion-box">
-                <h3>Instituciones</h3>
-                <div style="display: flex; gap: 5px;">
-                    <input type="text" id="inputInstitucion" placeholder="Nueva Institución">
-                    <button onclick="agregarItem('institucion')">+</button>
-                </div>
-                <ul id="listaInstituciones" class="lista-items"></ul>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                <h2 style="margin: 0;">Panel de Control</h2>
+                <button onclick="cerrarSesion()" style="background-color: #dc3545; padding: 8px 15px;">Cerrar Sesión</button>
             </div>
 
-            <div class="gestion-box">
-                <h3>Departamentos</h3>
-                <div style="display: flex; gap: 5px;">
-                    <input type="text" id="inputDepartamento" placeholder="Nuevo Departamento">
-                    <button onclick="agregarItem('departamento')">+</button>
+            <div style="margin-bottom: 40px;">
+                <h3>Gestión de Listas Desplegables</h3>
+                <p style="font-size: 0.9em; color: #666;">Agrega o elimina opciones para el formulario público.</p>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: space-between;">
+                    
+                    <div style="flex: 1; min-width: 250px;">
+                        <h4>Instituciones</h4>
+                        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                            <input type="text" id="inputInstitucion" placeholder="Nueva institución...">
+                            <button onclick="agregarItem('institucion')">+</button>
+                        </div>
+                        <ul id="listaInstituciones" style="max-height: 150px; overflow-y: auto; padding-left: 20px; border: 1px solid #eee;"></ul>
+                    </div>
+
+                    <div style="flex: 1; min-width: 250px;">
+                        <h4>Departamentos</h4>
+                        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                            <input type="text" id="inputDepartamento" placeholder="Nuevo departamento...">
+                            <button onclick="agregarItem('departamento')">+</button>
+                        </div>
+                        <ul id="listaDepartamentos" style="max-height: 150px; overflow-y: auto; padding-left: 20px; border: 1px solid #eee;"></ul>
+                    </div>
+
+                    <div style="flex: 1; min-width: 250px;">
+                        <h4>Municipios</h4>
+                        <select id="selectDeptoParaMuni" style="width: 100%; margin-bottom: 5px;">
+                            <option disabled selected>Cargando deptos...</option>
+                        </select>
+                        <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                            <input type="text" id="inputMunicipio" placeholder="Nuevo municipio...">
+                            <button onclick="agregarItem('municipio')">+</button>
+                        </div>
+                        <ul id="listaMunicipios" style="max-height: 150px; overflow-y: auto; padding-left: 20px; border: 1px solid #eee;"></ul>
+                    </div>
                 </div>
-                <ul id="listaDepartamentos" class="lista-items"></ul>
             </div>
 
-            <div class="gestion-box">
-                <h3>Municipios</h3>
-                <label style="font-size: 0.8em;">Primero selecciona el Depto:</label>
-                <select id="selectDeptoParaMuni" style="width: 100%; margin-bottom: 5px;">
-                    <option disabled selected>Cargando deptos...</option>
-                </select>
-                <div style="display: flex; gap: 5px;">
-                    <input type="text" id="inputMunicipio" placeholder="Nuevo Municipio">
-                    <button onclick="agregarItem('municipio')">+</button>
-                </div>
-                <ul id="listaMunicipios" class="lista-items" style="max-height: 200px; overflow-y: auto;"></ul>
+            <hr>
+
+            <h3>Registros Guardados</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr style="background-color: #f4f4f4; text-align: left;">
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">ID</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">Nombre</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">Puesto</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">Unidad / Dirección</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">Ubicación</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">Contacto</th>
+                            <th style="padding: 10px; border-bottom: 2px solid #ddd;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCuerpo">
+                        </tbody>
+                </table>
             </div>
         </div>
-
-        <hr>
-
-        <h3>Registros Guardados</h3>
-        <table border="1" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Puesto</th>
-                    <th>Unidad / Dirección</th>
-                    <th>Ubicación</th>
-                    <th>Contacto</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tablaCuerpo"></tbody>
-        </table>
     </div>
 
     <script src="admin.js"></script>
