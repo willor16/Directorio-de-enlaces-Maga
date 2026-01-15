@@ -5,6 +5,7 @@ let todosLosRegistros = [];
 async function checkLogin() {
     const pass = document.getElementById('passwordInput').value;
     const res = await fetch('/api/get-registros', { headers: { 'x-admin-password': pass } });
+
     if (res.status === 200) {
         passwordGuardada = pass;
         document.getElementById('loginScreen').style.display = 'none';
@@ -49,13 +50,21 @@ async function cargarSolicitudesPendientes() {
         contenedor.innerHTML = '';
         solicitudes.forEach(sol => {
             const nuevos = sol.nuevos_datos;
+            const original = sol; 
+
+            // Detectar cambios
+            const cambioInst = nuevos.institucion !== original.institucion ? `Cambio a: <b>${nuevos.institucion}</b><br>` : '';
+            const cambioUbicacion = (nuevos.departamento !== original.departamento || nuevos.municipio !== original.municipio) 
+                                    ? `Cambio Ubicación: <b>${nuevos.departamento} - ${nuevos.municipio}</b><br>` : '';
+
             const card = document.createElement('div');
             card.style.cssText = "background: #f9f9f9; border: 1px solid #eee; padding: 10px; margin-bottom: 10px; border-radius: 8px; font-size: 0.9em;";
             
             card.innerHTML = `
                 <div style="font-weight:bold; margin-bottom:5px; color:#005696;">${nuevos.nombre}</div>
                 <div style="margin-bottom:10px; font-size:0.85em;">
-                    <strong>Datos propuestos:</strong><br>
+                    ${cambioInst}
+                    ${cambioUbicacion}
                     Tipo: <b>${nuevos.tipoEnlace || 'N/A'}</b><br>
                     ${nuevos.puesto} - ${nuevos.unidad}<br>
                     ${nuevos.correo}<br>${nuevos.celular}
@@ -122,7 +131,7 @@ async function agregarItem(categoria) {
 async function borrarItem(id) { if (confirm('¿Eliminar?')) { await fetch(`/api/listas?id=${id}`, { method: 'DELETE', headers: { 'x-admin-password': passwordGuardada } }); cargarConfiguraciones(); } }
 async function borrarRegistro(id) { if (confirm('¿Seguro?')) { await fetch(`/api/delete-registro?id=${id}`, { headers: { 'x-admin-password': passwordGuardada } }); checkLogin(); } }
 
-// --- TABLAS ADMIN ---
+// --- TABLAS ADMIN MEJORADAS ---
 function cargarRegistrosPorInstitucion(registros) {
     const contenedor = document.getElementById('contenedorTablas'); 
     contenedor.innerHTML = '';
@@ -132,16 +141,19 @@ function cargarRegistrosPorInstitucion(registros) {
 
     instituciones.forEach(inst => {
         const registrosInst = registros.filter(r => r.institucion === inst);
+        
         const details = document.createElement('details');
         details.className = 'lista-desplegable';
+        
         details.innerHTML = `
-            <summary style="outline:none;">
+            <summary>
                 <span>${inst} <span style="font-weight:normal; opacity:0.8;">(${registrosInst.length})</span></span>
                 <button onclick="exportarExcelUnico('${inst}')" class="btn-excel" style="margin-left:auto;">📥 Excel</button>
             </summary>
-            <div style="overflow-x: auto; background:#fff;">
+            
+            <div class="tabla-responsive">
                 <table id="tabla-${inst.replace(/\s/g, '-')}" border="1">
-                    <thead style="background: #f4f4f4;">
+                    <thead>
                         <tr>
                             <th>ID</th><th>Nombre</th><th>Puesto</th><th>Unidad</th>
                             <th>Tipo Enlace</th><th>Ubicación</th><th>Contacto</th><th>Acciones</th>

@@ -1,194 +1,254 @@
 :root {
     --azul-gob: #005696;
-    --gris-claro: #f4f7f6;
-    --verde-excel: #28a745;
-    --cyan-actualizar: #17a2b8;
+    --azul-oscuro: #003d6b;
+    --gris-fondo: #f0f2f5;
+    --verde-admin: #28a745;
+    --amarillo-accion: #ffc107;
+    --blanco: #ffffff;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--gris-claro);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--gris-fondo);
     margin: 0;
     padding: 20px;
     color: #333;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 900px; /* Un poco más ancho para que las tablas respiren */
     margin: 0 auto;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    background: var(--blanco);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); /* Sombra elegante */
+    position: relative; /* Para posicionar el botón de admin */
+}
+
+/* CABECERA Y LOGOS */
+.header-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 30px;
 }
 
 h1 {
     text-align: center;
     color: var(--azul-gob);
-    margin-bottom: 5px;
+    margin: 10px 0;
+    font-size: 2.2em;
 }
 
 .subtitle {
     text-align: center;
     color: #666;
     margin-top: 0;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
     font-size: 1.1em;
+    font-weight: 300;
 }
 
 /* FORMULARIOS */
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: 600;
-    color: #555;
+    color: #444;
+    font-size: 0.95em;
 }
 
 input, select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 12px 15px;
+    border: 2px solid #e1e1e1; /* Bordes más gruesos pero suaves */
+    border-radius: 8px;
     font-size: 16px;
+    transition: all 0.3s ease;
+    background-color: #fafafa;
     box-sizing: border-box;
 }
 
 input:focus, select:focus {
     border-color: var(--azul-gob);
+    background-color: #fff;
     outline: none;
-    box-shadow: 0 0 5px rgba(0, 86, 150, 0.2);
+    box-shadow: 0 0 0 3px rgba(0, 86, 150, 0.1);
 }
 
-/* BOTONES */
+/* BOTÓN PRINCIPAL (GUARDAR) */
 .btn-primary {
-    background-color: var(--azul-gob);
+    background: linear-gradient(135deg, var(--azul-gob) 0%, var(--azul-oscuro) 100%);
     color: white;
     border: none;
-    padding: 12px;
+    padding: 15px;
     width: 100%;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background 0.3s;
-    margin-top: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .btn-primary:hover {
-    background-color: #00447a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 86, 150, 0.3);
 }
 
 .btn-primary:disabled {
-    background-color: #ccc;
+    background: #ccc;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
-/* ESTILOS NUEVOS: LISTAS DESPLEGABLES (ACORDEÓN) */
-details.lista-desplegable, 
-details.tabla-institucion-container {
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+/* --- NUEVO DISEÑO DE TABLAS --- */
+details.lista-desplegable {
+    margin-bottom: 20px;
+    border-radius: 10px;
     overflow: hidden;
     background: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
 }
 
 summary {
     background: var(--azul-gob);
     color: white;
-    padding: 12px 15px;
+    padding: 15px 20px;
     cursor: pointer;
-    font-weight: bold;
-    list-style: none; /* Ocultar triángulo default */
+    font-weight: 600;
+    font-size: 1.1em;
+    list-style: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background 0.3s;
 }
 
-summary::-webkit-details-marker {
-    display: none;
+summary:hover {
+    background: var(--azul-oscuro);
 }
 
-/* Triángulo personalizado */
-summary::after {
-    content: '+'; 
-    font-size: 1.5em;
-    font-weight: bold;
-    line-height: 0.5;
+/* Tabla interna bonita */
+.tabla-responsive {
+    overflow-x: auto;
 }
 
-details[open] summary::after {
-    content: '-';
-}
-
-/* ESTILOS DE TABLAS */
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: collapse; /* Elimina espacios entre celdas */
+    background: white;
 }
 
-th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    font-size: 0.9em;
-}
-
+/* Encabezados de tabla */
 th {
-    background: #f9f9f9;
-    color: #555;
-    font-weight: 700;
-}
-
-tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* BADGES Y BOTONES DE ACCIÓN */
-.badge {
-    background: #e9ecef;
-    color: #495057;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
+    background-color: #f8f9fa;
+    color: var(--azul-gob);
     font-weight: 700;
     text-transform: uppercase;
-    border: 1px solid #ced4da;
+    font-size: 0.85em;
+    padding: 15px;
+    border-bottom: 2px solid #e9ecef;
+    text-align: left;
 }
 
+/* Celdas */
+td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    color: #555;
+    font-size: 0.95em;
+    vertical-align: middle;
+}
+
+/* Efecto cebra (filas alternas) */
+tbody tr:nth-child(even) {
+    background-color: #fcfcfc;
+}
+
+/* Hover en filas */
+tbody tr:hover {
+    background-color: #e2f0fb; /* Un azul muy clarito al pasar el mouse */
+    transition: background 0.2s;
+}
+
+/* BADGES (Etiquetas) */
+.badge {
+    background: #e3f2fd;
+    color: var(--azul-gob);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+/* BOTÓN ACTUALIZAR (AMARILLO) */
 .btn-actualizar {
-    background-color: var(--cyan-actualizar);
-    color: white;
+    background-color: var(--amarillo-accion);
+    color: #333; /* Texto oscuro para contraste */
     border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
+    padding: 8px 16px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.85em;
+    font-size: 0.9em;
     font-weight: bold;
-    transition: transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s;
 }
 
 .btn-actualizar:hover {
-    background-color: #138496;
+    background-color: #e0a800;
     transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-.btn-excel {
-    background-color: var(--verde-excel);
+/* BOTÓN DE ADMIN (VERDE Y POSICIONADO) */
+.btn-admin-top {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    background-color: var(--verde-admin);
     color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 50px; /* Redondo estilo píldora */
+    font-weight: bold;
     font-size: 0.9em;
-    margin-left: 10px;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
 }
-.btn-excel:hover { background-color: #218838; }
 
-/* LOGIN & ADMIN EXTRA */
-.login-card { max-width: 400px; margin: 60px auto; padding: 30px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+.btn-admin-top:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 600px) {
+    .btn-admin-top {
+        position: static;
+        display: block;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .container {
+        padding: 20px;
+    }
+}

@@ -1,11 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Cargas iniciales
     await cargarSelect('/api/listas?tipo=institucion', 'institucion');
     await cargarSelect('/api/listas?tipo=departamento', 'departamento');
     gestionarTerritorio();
     cargarDirectorioPublico();
 });
 
-// --- FORMULARIO ---
+// --- LÓGICA DEL FORMULARIO ---
+
 async function cargarSelect(url, idElemento) {
     try {
         const res = await fetch(url);
@@ -14,7 +16,9 @@ async function cargarSelect(url, idElemento) {
         select.innerHTML = '<option value="" disabled selected>Seleccione...</option>';
         datos.forEach(item => {
             const opt = document.createElement('option');
-            opt.value = item.valor; opt.innerText = item.valor; select.appendChild(opt);
+            opt.value = item.valor;
+            opt.innerText = item.valor;
+            select.appendChild(opt);
         });
     } catch (error) { console.error("Error cargando lista:", error); }
 }
@@ -90,7 +94,7 @@ document.getElementById('registroForm').addEventListener('submit', async (e) => 
     btn.innerText = textoOriginal; btn.disabled = false;
 });
 
-// --- DIRECTORIO PÚBLICO ---
+// --- DIRECTORIO PÚBLICO MEJORADO ---
 async function cargarDirectorioPublico() {
     const contenedor = document.getElementById('contenedorDirectorio');
     try {
@@ -99,7 +103,7 @@ async function cargarDirectorioPublico() {
         const registros = json.data;
 
         if (!registros || registros.length === 0) {
-            contenedor.innerHTML = '<p style="text-align:center;">No hay registros aún.</p>';
+            contenedor.innerHTML = '<p style="text-align:center; color:#888;">No hay registros disponibles aún.</p>';
             return;
         }
 
@@ -112,9 +116,14 @@ async function cargarDirectorioPublico() {
             const details = document.createElement('details');
             details.className = 'lista-desplegable';
             
+            // Usamos la clase 'tabla-responsive' del nuevo CSS
             details.innerHTML = `
-                <summary>${inst} <span style="font-size:0.9em; opacity:0.9;">(${registrosInst.length})</span></summary>
-                <div style="overflow-x: auto; background: #fff;">
+                <summary>
+                    <span>${inst}</span>
+                    <span class="badge" style="background: rgba(255,255,255,0.2); color:white;">${registrosInst.length}</span>
+                </summary>
+                
+                <div class="tabla-responsive">
                     <table>
                         <thead>
                             <tr>
@@ -128,7 +137,7 @@ async function cargarDirectorioPublico() {
                         <tbody>
                             ${registrosInst.map(r => `
                                 <tr>
-                                    <td><strong>${r.nombre_completo}</strong></td>
+                                    <td style="font-weight:600; color:#333;">${r.nombre_completo}</td>
                                     <td>${r.unidad_direccion}</td>
                                     <td><span class="badge">${r.tipo_enlace || 'N/A'}</span></td>
                                     <td>${r.departamento}${r.municipio ? ', ' + r.municipio : ''}</td>
@@ -148,7 +157,7 @@ async function cargarDirectorioPublico() {
     } catch (error) { console.error(error); contenedor.innerHTML = 'Error cargando directorio.'; }
 }
 
-// --- MODAL ACTUALIZAR (Corregido con Tipo de Enlace) ---
+// --- MODAL ACTUALIZAR ---
 window.abrirModalActualizar = async function(registro) {
     const { value: formValues } = await Swal.fire({
         title: 'Actualizar Datos',
@@ -157,11 +166,32 @@ window.abrirModalActualizar = async function(registro) {
                 Deje en blanco lo que está correcto. Cambie solo lo necesario.
             </p>
             
+            <label style="display:block; text-align:left; font-size:0.8em; font-weight:bold; color:#555;">Institución</label>
+            <select id="swal-institucion" class="swal2-input">
+                <option value="">Cargando lista...</option>
+            </select>
+
+            <label style="display:block; text-align:left; font-size:0.8em; font-weight:bold; color:#555; margin-top:10px;">Tipo de Enlace</label>
             <select id="swal-tipoEnlace" class="swal2-input">
                 <option value="">Cambiar Tipo de Enlace (Opcional)</option>
                 <option value="departamental">Enlace Departamental</option>
                 <option value="municipal">Enlace Municipal</option>
             </select>
+
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <div style="flex:1;">
+                    <label style="display:block; text-align:left; font-size:0.8em; font-weight:bold; color:#555;">Departamento</label>
+                    <select id="swal-departamento" class="swal2-input">
+                        <option value="">Cargando...</option>
+                    </select>
+                </div>
+                <div style="flex:1;">
+                    <label style="display:block; text-align:left; font-size:0.8em; font-weight:bold; color:#555;">Municipio</label>
+                    <select id="swal-municipio" class="swal2-input" disabled>
+                        <option value="">Seleccione Depto...</option>
+                    </select>
+                </div>
+            </div>
             
             <input id="swal-nombre" class="swal2-input" placeholder="Nuevo Nombre">
             <input id="swal-puesto" class="swal2-input" placeholder="Nuevo Puesto">
@@ -173,6 +203,37 @@ window.abrirModalActualizar = async function(registro) {
         showCancelButton: true,
         confirmButtonText: 'Enviar Actualización',
         cancelButtonText: 'Cancelar',
+        
+        didOpen: async () => {
+            // Cargar Instituciones
+            const resInst = await fetch('/api/listas?tipo=institucion');
+            const dataInst = await resInst.json();
+            const selInst = document.getElementById('swal-institucion');
+            selInst.innerHTML = '<option value="">(Sin cambios)</option>';
+            dataInst.forEach(i => selInst.innerHTML += `<option value="${i.valor}">${i.valor}</option>`);
+
+            // Cargar Departamentos
+            const resDepto = await fetch('/api/listas?tipo=departamento');
+            const dataDepto = await resDepto.json();
+            const selDepto = document.getElementById('swal-departamento');
+            selDepto.innerHTML = '<option value="">(Sin cambios)</option>';
+            dataDepto.forEach(d => selDepto.innerHTML += `<option value="${d.valor}">${d.valor}</option>`);
+
+            // Lógica de Municipios
+            selDepto.addEventListener('change', async () => {
+                const selMuni = document.getElementById('swal-municipio');
+                selMuni.disabled = true;
+                selMuni.innerHTML = '<option>Cargando...</option>';
+                if(selDepto.value) {
+                    const resMuni = await fetch(`/api/listas?tipo=municipio&padre=${selDepto.value}`);
+                    const dataMuni = await resMuni.json();
+                    selMuni.innerHTML = '<option value="">Seleccione...</option>';
+                    dataMuni.forEach(m => selMuni.innerHTML += `<option value="${m.valor}">${m.valor}</option>`);
+                    selMuni.disabled = false;
+                }
+            });
+        },
+
         preConfirm: () => {
             const val = (id, original) => {
                 const input = document.getElementById(id).value.trim();
@@ -180,17 +241,15 @@ window.abrirModalActualizar = async function(registro) {
             };
 
             return {
+                institucion: val('swal-institucion', registro.institucion),
+                tipoEnlace: val('swal-tipoEnlace', registro.tipo_enlace),
+                departamento: val('swal-departamento', registro.departamento),
+                municipio: val('swal-municipio', registro.municipio),
                 nombre: val('swal-nombre', registro.nombre_completo),
                 puesto: val('swal-puesto', registro.puesto),
                 unidad: val('swal-unidad', registro.unidad_direccion),
                 correo: val('swal-correo', registro.correo),
                 celular: val('swal-celular', registro.celular),
-                tipoEnlace: val('swal-tipoEnlace', registro.tipo_enlace), // ¡Aquí capturamos el cambio!
-                
-                // Datos base (no editables)
-                institucion: registro.institucion,
-                departamento: registro.departamento,
-                municipio: registro.municipio
             }
         }
     });
@@ -202,7 +261,6 @@ window.abrirModalActualizar = async function(registro) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ registro_id: registro.id, nuevos_datos: formValues })
             });
-            
             if(res.ok) Swal.fire('Enviado', 'Actualización pendiente de revisión.', 'success');
             else Swal.fire('Error', 'No se pudo enviar.', 'error');
         } catch(e) { Swal.fire('Error', 'Fallo de conexión.', 'error'); }
