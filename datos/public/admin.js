@@ -5,12 +5,10 @@ let todosLosRegistros = [];
 async function checkLogin() {
     const pass = document.getElementById('passwordInput').value;
     const res = await fetch('/api/get-registros', { headers: { 'x-admin-password': pass } });
-
     if (res.status === 200) {
         passwordGuardada = pass;
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
-        
         const json = await res.json();
         todosLosRegistros = json.data;
         cargarRegistrosPorInstitucion(todosLosRegistros);
@@ -24,7 +22,7 @@ function cerrarSesion() {
     window.location.href = "/";
 }
 
-// --- SIDEBAR DE SOLICITUDES ---
+// --- SIDEBAR SOLICITUDES ---
 window.toggleSidebar = function() {
     const sb = document.getElementById('sidebarSolicitudes');
     if (sb.style.right === '0px') sb.style.right = '-400px';
@@ -37,7 +35,6 @@ window.toggleSidebar = function() {
 async function cargarSolicitudesPendientes() {
     const contenedor = document.getElementById('listaSolicitudes');
     contenedor.innerHTML = '<p>Cargando...</p>';
-
     if(!passwordGuardada) return;
 
     try {
@@ -58,9 +55,10 @@ async function cargarSolicitudesPendientes() {
             card.innerHTML = `
                 <div style="font-weight:bold; margin-bottom:5px; color:#005696;">${nuevos.nombre}</div>
                 <div style="margin-bottom:10px; font-size:0.85em;">
-                    <strong>Cambios propuestos:</strong><br>
+                    <strong>Datos propuestos:</strong><br>
+                    Tipo: <b>${nuevos.tipoEnlace || 'N/A'}</b><br>
                     ${nuevos.puesto} - ${nuevos.unidad}<br>
-                    ${nuevos.correo} <br> ${nuevos.celular}
+                    ${nuevos.correo}<br>${nuevos.celular}
                 </div>
                 <div style="display:flex; gap:5px;">
                     <button onclick='aprobarEdicion(${JSON.stringify(sol)})' style="flex:1; background:#28a745; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">✔</button>
@@ -83,7 +81,7 @@ async function aprobarEdicion(solicitud) {
         if(res.ok) {
             Swal.fire('Aprobado', 'Registro actualizado.', 'success');
             cargarSolicitudesPendientes();
-            checkLogin(); // Recargar tablas
+            checkLogin(); 
         }
     } catch(e) { console.error(e); }
 }
@@ -96,7 +94,7 @@ async function rechazarEdicion(id) {
     } catch(e) { console.error(e); }
 }
 
-// --- GESTIÓN DE CONFIGURACIÓN ---
+// --- GESTIÓN DE LISTAS ---
 async function cargarConfiguraciones() {
     const res = await fetch('/api/listas'); const datos = await res.json();
     const listaInst = document.getElementById('listaInstituciones'); const listaDepto = document.getElementById('listaDepartamentos'); const listaMuni = document.getElementById('listaMunicipios'); const selectDepto = document.getElementById('selectDeptoParaMuni');
@@ -124,58 +122,39 @@ async function agregarItem(categoria) {
 async function borrarItem(id) { if (confirm('¿Eliminar?')) { await fetch(`/api/listas?id=${id}`, { method: 'DELETE', headers: { 'x-admin-password': passwordGuardada } }); cargarConfiguraciones(); } }
 async function borrarRegistro(id) { if (confirm('¿Seguro?')) { await fetch(`/api/delete-registro?id=${id}`, { headers: { 'x-admin-password': passwordGuardada } }); checkLogin(); } }
 
-// --- VISUALIZACIÓN ADMIN (ACORDEÓN + TABLA COMPLETA) ---
+// --- TABLAS ADMIN ---
 function cargarRegistrosPorInstitucion(registros) {
     const contenedor = document.getElementById('contenedorTablas'); 
     contenedor.innerHTML = '';
     const instituciones = [...new Set(registros.map(r => r.institucion))].sort();
     
-    if (instituciones.length === 0) { 
-        contenedor.innerHTML = '<p style="text-align:center;">No hay registros.</p>'; 
-        return; 
-    }
+    if (instituciones.length === 0) { contenedor.innerHTML = '<p style="text-align:center;">No hay registros.</p>'; return; }
 
     instituciones.forEach(inst => {
         const registrosInst = registros.filter(r => r.institucion === inst);
-        
-        // Usamos details para el acordeón
         const details = document.createElement('details');
         details.className = 'lista-desplegable';
-        
-        // Header Admin: Título + Cantidad + Botón Excel
         details.innerHTML = `
             <summary style="outline:none;">
                 <span>${inst} <span style="font-weight:normal; opacity:0.8;">(${registrosInst.length})</span></span>
                 <button onclick="exportarExcelUnico('${inst}')" class="btn-excel" style="margin-left:auto;">📥 Excel</button>
             </summary>
-            
             <div style="overflow-x: auto; background:#fff;">
                 <table id="tabla-${inst.replace(/\s/g, '-')}" border="1">
                     <thead style="background: #f4f4f4;">
                         <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Puesto</th>
-                            <th>Unidad</th>
-                            <th>Tipo Enlace</th>
-                            <th>Ubicación</th>
-                            <th>Contacto</th>
-                            <th>Acciones</th>
+                            <th>ID</th><th>Nombre</th><th>Puesto</th><th>Unidad</th>
+                            <th>Tipo Enlace</th><th>Ubicación</th><th>Contacto</th><th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${registrosInst.map(r => `
                             <tr>
-                                <td>${r.id}</td>
-                                <td>${r.nombre_completo}</td>
-                                <td>${r.puesto}</td>
-                                <td>${r.unidad_direccion}</td>
+                                <td>${r.id}</td><td>${r.nombre_completo}</td><td>${r.puesto}</td><td>${r.unidad_direccion}</td>
                                 <td style="color:#005696; font-weight:bold;">${r.tipo_enlace || '-'}</td>
                                 <td>${r.departamento}${r.municipio ? ' - '+r.municipio : ''}</td>
                                 <td>${r.correo}<br>${r.celular}</td>
-                                <td style="text-align:center;">
-                                    <button onclick="borrarRegistro(${r.id})" style="background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">Borrar</button>
-                                </td>
+                                <td style="text-align:center;"><button onclick="borrarRegistro(${r.id})" style="background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">Borrar</button></td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -198,7 +177,6 @@ function exportarTodoGlobal() {
     let datos = [];
     const headers = ["ID", "Nombre", "Puesto", "Unidad", "Tipo Enlace", "Departamento", "Municipio", "Correo", "Celular"];
     const instituciones = [...new Set(todosLosRegistros.map(r => r.institucion))].sort();
-    
     instituciones.forEach(inst => {
         datos.push([`INSTITUCIÓN: ${inst.toUpperCase()}`]); datos.push(headers);
         todosLosRegistros.filter(r => r.institucion === inst).forEach(r => 
@@ -210,5 +188,4 @@ function exportarTodoGlobal() {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(datos), "Reporte Completo");
     XLSX.writeFile(wb, `Reporte-GLOBAL-${new Date().toISOString().slice(0,10)}.xlsx`);
 }
-
 function limpiarUltimaColumna(tabla) { for (let i = 0; i < tabla.rows.length; i++) { const row = tabla.rows[i]; if (row.cells.length > 0) row.deleteCell(row.cells.length - 1); } }

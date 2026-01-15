@@ -1,13 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Cargas iniciales
     await cargarSelect('/api/listas?tipo=institucion', 'institucion');
     await cargarSelect('/api/listas?tipo=departamento', 'departamento');
     gestionarTerritorio();
     cargarDirectorioPublico();
 });
 
-// --- LÓGICA DEL FORMULARIO ---
-
+// --- FORMULARIO ---
 async function cargarSelect(url, idElemento) {
     try {
         const res = await fetch(url);
@@ -16,9 +14,7 @@ async function cargarSelect(url, idElemento) {
         select.innerHTML = '<option value="" disabled selected>Seleccione...</option>';
         datos.forEach(item => {
             const opt = document.createElement('option');
-            opt.value = item.valor;
-            opt.innerText = item.valor;
-            select.appendChild(opt);
+            opt.value = item.valor; opt.innerText = item.valor; select.appendChild(opt);
         });
     } catch (error) { console.error("Error cargando lista:", error); }
 }
@@ -94,8 +90,7 @@ document.getElementById('registroForm').addEventListener('submit', async (e) => 
     btn.innerText = textoOriginal; btn.disabled = false;
 });
 
-// --- DIRECTORIO PÚBLICO (LISTA DESPLEGABLE Y DATOS LIMITADOS) ---
-
+// --- DIRECTORIO PÚBLICO ---
 async function cargarDirectorioPublico() {
     const contenedor = document.getElementById('contenedorDirectorio');
     try {
@@ -114,11 +109,9 @@ async function cargarDirectorioPublico() {
         instituciones.forEach(inst => {
             const registrosInst = registros.filter(r => r.institucion === inst);
             
-            // Usamos <details> para lista desplegable
             const details = document.createElement('details');
             details.className = 'lista-desplegable';
             
-            // Header del acordeón con conteo
             details.innerHTML = `
                 <summary>${inst} <span style="font-size:0.9em; opacity:0.9;">(${registrosInst.length})</span></summary>
                 <div style="overflow-x: auto; background: #fff;">
@@ -155,27 +148,32 @@ async function cargarDirectorioPublico() {
     } catch (error) { console.error(error); contenedor.innerHTML = 'Error cargando directorio.'; }
 }
 
-// --- MODAL DE ACTUALIZACIÓN CONFIDENCIAL ---
+// --- MODAL ACTUALIZAR (Corregido con Tipo de Enlace) ---
 window.abrirModalActualizar = async function(registro) {
-    // Inputs vacíos para confidencialidad
     const { value: formValues } = await Swal.fire({
         title: 'Actualizar Datos',
         html: `
             <p style="font-size:0.9em; margin-bottom:15px; color:#666;">
-                Ingrese <b>SOLO</b> los datos que desea cambiar. Deje en blanco lo que está correcto.
+                Deje en blanco lo que está correcto. Cambie solo lo necesario.
             </p>
-            <input id="swal-nombre" class="swal2-input" placeholder="Nuevo Nombre (Opcional)">
-            <input id="swal-puesto" class="swal2-input" placeholder="Nuevo Puesto (Opcional)">
-            <input id="swal-unidad" class="swal2-input" placeholder="Nueva Unidad (Opcional)">
-            <input id="swal-correo" class="swal2-input" placeholder="Nuevo Correo (Opcional)">
-            <input id="swal-celular" class="swal2-input" placeholder="Nuevo Celular (Opcional)">
+            
+            <select id="swal-tipoEnlace" class="swal2-input">
+                <option value="">Cambiar Tipo de Enlace (Opcional)</option>
+                <option value="departamental">Enlace Departamental</option>
+                <option value="municipal">Enlace Municipal</option>
+            </select>
+            
+            <input id="swal-nombre" class="swal2-input" placeholder="Nuevo Nombre">
+            <input id="swal-puesto" class="swal2-input" placeholder="Nuevo Puesto">
+            <input id="swal-unidad" class="swal2-input" placeholder="Nueva Unidad">
+            <input id="swal-correo" class="swal2-input" placeholder="Nuevo Correo">
+            <input id="swal-celular" class="swal2-input" placeholder="Nuevo Celular">
         `,
         focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'Enviar Actualización',
         cancelButtonText: 'Cancelar',
         preConfirm: () => {
-            // Si el input está vacío, usamos el valor original del registro
             const val = (id, original) => {
                 const input = document.getElementById(id).value.trim();
                 return input === "" ? original : input;
@@ -187,11 +185,12 @@ window.abrirModalActualizar = async function(registro) {
                 unidad: val('swal-unidad', registro.unidad_direccion),
                 correo: val('swal-correo', registro.correo),
                 celular: val('swal-celular', registro.celular),
-                // Datos base no editables
+                tipoEnlace: val('swal-tipoEnlace', registro.tipo_enlace), // ¡Aquí capturamos el cambio!
+                
+                // Datos base (no editables)
                 institucion: registro.institucion,
                 departamento: registro.departamento,
-                municipio: registro.municipio,
-                tipoEnlace: registro.tipo_enlace
+                municipio: registro.municipio
             }
         }
     });
@@ -204,7 +203,7 @@ window.abrirModalActualizar = async function(registro) {
                 body: JSON.stringify({ registro_id: registro.id, nuevos_datos: formValues })
             });
             
-            if(res.ok) Swal.fire('Enviado', 'La actualización será revisada.', 'success');
+            if(res.ok) Swal.fire('Enviado', 'Actualización pendiente de revisión.', 'success');
             else Swal.fire('Error', 'No se pudo enviar.', 'error');
         } catch(e) { Swal.fire('Error', 'Fallo de conexión.', 'error'); }
     }
