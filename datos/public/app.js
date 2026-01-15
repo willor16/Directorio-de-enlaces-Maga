@@ -1,62 +1,41 @@
-document.addEventListener('DOMContentLoaded', async () => {
-    cargarLista('institucion');
-    cargarLista('departamento');
+const lugares = {
+    "Sololá": ["Sololá", "Concepción", "Nahualá", "Panajachel"],
+    "Quetzaltenango": ["Quetzaltenango", "Salcajá", "Olintepeque"],
+    "Totonicapán": ["Totonicapán", "San Cristóbal"]
+    // Agrega tus 15 departamentos aquí
+};
+
+// Cargar departamentos al inicio
+const deptoSelect = document.getElementById('departamento');
+Object.keys(lugares).forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d; opt.innerText = d;
+    deptoSelect.appendChild(opt);
 });
 
-// Cargar listas iniciales
-async function cargarLista(tipo) {
-    try {
-        const response = await fetch(`/api/listas?tipo=${tipo}`);
-        const datos = await response.json();
-        
-        const select = document.getElementById(tipo);
-        // Mantenemos el placeholder, borramos lo demás
-        select.innerHTML = `<option value="" disabled selected>Seleccione...</option>`;
-
-        datos.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.valor;
-            option.textContent = item.valor;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error(`Error cargando ${tipo}:`, error);
-    }
-}
-
-// Cargar municipios cuando cambia el departamento
-async function cargarMunicipios() {
-    const deptoSelect = document.getElementById('departamento');
+function cargarMunicipios() {
     const muniSelect = document.getElementById('municipio');
-    const deptoNombre = deptoSelect.value;
-
-    if (!deptoNombre) return;
-
-    muniSelect.disabled = false;
-    muniSelect.innerHTML = `<option>Cargando...</option>`;
-
-    try {
-        const response = await fetch(`/api/listas?tipo=municipio&padre=${deptoNombre}`);
-        const datos = await response.json();
-
-        muniSelect.innerHTML = `<option value="" disabled selected>Seleccione...</option>`;
-        
-        datos.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.valor;
-            option.textContent = item.valor;
-            muniSelect.appendChild(option);
+    const depto = deptoSelect.value;
+    muniSelect.innerHTML = '<option value="">Seleccione...</option>';
+    
+    if (depto && lugares[depto]) {
+        muniSelect.disabled = false;
+        lugares[depto].forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m; opt.innerText = m;
+            muniSelect.appendChild(opt);
         });
-    } catch (error) {
-        console.error('Error cargando municipios:', error);
+    } else {
+        muniSelect.disabled = true;
     }
 }
 
-// Enviar formulario (Sin cambios en tu lógica original de envío)
-document.getElementById('registroForm').addEventListener('submit', async function(e) {
+document.getElementById('registroForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = document.getElementById('btnGuardar');
+    btn.innerText = "Guardando..."; btn.disabled = true;
 
-    const datos = {
+    const data = {
         institucion: document.getElementById('institucion').value,
         departamento: document.getElementById('departamento').value,
         municipio: document.getElementById('municipio').value,
@@ -64,35 +43,25 @@ document.getElementById('registroForm').addEventListener('submit', async functio
         puesto: document.getElementById('puesto').value,
         unidad: document.getElementById('unidad').value,
         correo: document.getElementById('correo').value,
-        celular: document.getElementById('celular').value
+        celular: document.getElementById('celular').value,
     };
 
     try {
         const res = await fetch('/api/post-registro', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datos)
+            body: JSON.stringify(data)
         });
-
+        
         if (res.ok) {
-            Swal.fire({
-                title: '¡Éxito!',
-                text: 'Datos guardados correctamente',
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
-            }).then(() => {
-                document.getElementById('registroForm').reset();
-                // Reiniciar el select de municipios
-                document.getElementById('municipio').innerHTML = '<option value="" disabled selected>Seleccione un departamento primero</option>';
-                document.getElementById('municipio').disabled = true;
-            });
+            Swal.fire('¡Éxito!', 'Registro guardado correctamente', 'success');
+            document.getElementById('registroForm').reset();
         } else {
-            throw new Error('Error en el servidor');
+            Swal.fire('Error', 'No se pudo guardar', 'error');
         }
-    } catch (error) {
-        Swal.fire('Error', 'Hubo un problema al guardar', 'error');
+    } catch (err) {
+        console.error(err);
+        Swal.fire('Error', 'Error de conexión', 'error');
     }
+    btn.innerText = "GUARDAR REGISTRO"; btn.disabled = false;
 });
-
-// Hacemos global la función cargarMunicipios para que el HTML la vea
-window.cargarMunicipios = cargarMunicipios;
