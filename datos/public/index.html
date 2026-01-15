@@ -10,9 +10,7 @@
 <body>
     <div class="container">
         
-        <a href="./admin.html" class="btn-admin-top">
-            🔐 Acceso Admin
-        </a>
+        <a href="/public/admin.html" class="btn-admin-top">🔐 Acceso Admin</a>
 
         <div class="header-area">
             <img src="logo1.jpeg" alt="Logo 1" style="max-height: 90px; width: auto;">
@@ -46,7 +44,6 @@
                         <option value="" disabled selected>Cargando departamentos...</option>
                     </select>
                 </div>
-                
                 <div class="form-group" style="flex: 1;" id="divMunicipio">
                     <label>Municipio</label>
                     <select id="municipio" name="municipio" required disabled>
@@ -58,12 +55,10 @@
             <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
 
             <div class="form-group"><label>Nombre Completo</label><input type="text" id="nombre" name="nombre" required></div>
-            
             <div style="display: flex; gap: 15px;">
                 <div class="form-group" style="flex: 1;"><label>Puesto</label><input type="text" id="puesto" name="puesto" required></div>
                 <div class="form-group" style="flex: 1;"><label>Unidad/Dirección</label><input type="text" id="unidad" name="unidad" required></div>
             </div>
-            
             <div style="display: flex; gap: 15px;">
                 <div class="form-group" style="flex: 1;"><label>Correo</label><input type="email" id="correo" name="correo" required></div>
                 <div class="form-group" style="flex: 1;"><label>Celular</label><input type="tel" id="celular" name="celular" required></div>
@@ -73,14 +68,12 @@
         </form>
         
         <hr style="border: 0; border-top: 2px solid #eee; margin: 50px 0 30px 0;">
-        
         <h2 style="text-align: center; color: var(--azul-gob); margin-bottom: 25px;">Directorio de Enlaces</h2>
         
         <div id="contenedorDirectorio">
-            <p style="text-align:center; color:#999; font-style:italic;">Cargando directorio...</p>
+            <p style="text-align:center; color:#999;">Cargando directorio...</p>
         </div>
     </div>
-    
     <script src="app.js"></script>
 </body>
 </html>
