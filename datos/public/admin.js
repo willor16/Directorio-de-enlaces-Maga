@@ -1,145 +1,104 @@
-let passwordGuardada = "";
+let registrosGlobal = [];
 
-// --- LOGIN ---
-async function checkLogin() {
+function checkLogin() {
     const pass = document.getElementById('passwordInput').value;
-    
-    // Verificamos contraseña pidiendo los datos
-    const res = await fetch('/api/get-registros', {
-        headers: { 'x-admin-password': pass }
-    });
-
-    if (res.status === 200) {
-        passwordGuardada = pass;
+    if (pass === "admin2026") { // CAMBIA ESTO
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
-        
-        // Cargar todo
-        cargarRegistros(await res.json());
-        cargarConfiguraciones();
+        cargarDatos();
     } else {
         Swal.fire('Error', 'Contraseña incorrecta', 'error');
     }
 }
 
-function cerrarSesion() {
-    passwordGuardada = "";
-    window.location.href = "/";
+async function cargarDatos() {
+    const res = await fetch('/api/get-registros');
+    const json = await res.json();
+    registrosGlobal = json.data;
+    renderTabla();
 }
 
-// --- GESTIÓN DE LISTAS (Instituciones, Deptos, Munis) ---
-async function cargarConfiguraciones() {
-    // Pedimos TODA la configuración de un solo golpe
-    const res = await fetch('/api/listas');
-    const datos = await res.json();
-
-    const listaInst = document.getElementById('listaInstituciones');
-    const listaDepto = document.getElementById('listaDepartamentos');
-    const listaMuni = document.getElementById('listaMunicipios');
-    const selectDepto = document.getElementById('selectDeptoParaMuni');
-
-    // Limpiamos
-    listaInst.innerHTML = '';
-    listaDepto.innerHTML = '';
-    listaMuni.innerHTML = '';
-    
-    // Guardamos selección actual del dropdown para no perderla al recargar
-    const deptoSeleccionado = selectDepto.value;
-    selectDepto.innerHTML = '<option value="" disabled selected>Selecciona Depto...</option>';
-
-    datos.forEach(item => {
-        const btnBorrar = `<button onclick="borrarItem(${item.id})" style="color:red; border:none; cursor:pointer;">X</button>`;
-        const li = document.createElement('li');
-        
-        if (item.categoria === 'institucion') {
-            li.innerHTML = `${item.valor} ${btnBorrar}`;
-            listaInst.appendChild(li);
-
-        } else if (item.categoria === 'departamento') {
-            li.innerHTML = `${item.valor} ${btnBorrar}`;
-            listaDepto.appendChild(li);
-            
-            // Agregar al dropdown de selección
-            const opt = document.createElement('option');
-            opt.value = item.valor;
-            opt.textContent = item.valor;
-            selectDepto.appendChild(opt);
-
-        } else if (item.categoria === 'municipio') {
-            li.innerHTML = `<small>(${item.padre})</small> <b>${item.valor}</b> ${btnBorrar}`;
-            listaMuni.appendChild(li);
-        }
-    });
-
-    // Restaurar selección del dropdown si existía
-    if(deptoSeleccionado) selectDepto.value = deptoSeleccionado;
-}
-
-async function agregarItem(categoria) {
-    let valor = "";
-    let padre = null;
-
-    if (categoria === 'institucion') valor = document.getElementById('inputInstitucion').value;
-    if (categoria === 'departamento') valor = document.getElementById('inputDepartamento').value;
-    if (categoria === 'municipio') {
-        valor = document.getElementById('inputMunicipio').value;
-        padre = document.getElementById('selectDeptoParaMuni').value;
-        if (!padre) return Swal.fire('Alto', 'Debes seleccionar un departamento primero', 'warning');
-    }
-
-    if (!valor) return;
-
-    await fetch('/api/listas', {
-        method: 'POST',
-        headers: { 'x-admin-password': passwordGuardada },
-        body: JSON.stringify({ categoria, valor, padre })
-    });
-
-    // Limpiar inputs y recargar
-    document.getElementById('inputInstitucion').value = '';
-    document.getElementById('inputDepartamento').value = '';
-    document.getElementById('inputMunicipio').value = '';
-    cargarConfiguraciones();
-}
-
-async function borrarItem(id) {
-    if (confirm('¿Eliminar este elemento de la lista?')) {
-        await fetch(`/api/listas?id=${id}`, {
-            method: 'DELETE',
-            headers: { 'x-admin-password': passwordGuardada }
-        });
-        cargarConfiguraciones();
-    }
-}
-
-// --- GESTIÓN DE REGISTROS (La tabla grande) ---
-function cargarRegistros(json) {
-    const tbody = document.getElementById('tablaCuerpo');
+function renderTabla() {
+    const tbody = document.querySelector('#tablaRegistros tbody');
     tbody.innerHTML = '';
-
-    json.data.forEach(registro => {
+    registrosGlobal.forEach(r => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${registro.id}</td>
-            <td>${registro.nombre_completo}</td>
-            <td>${registro.puesto}</td>
-            <td>${registro.unidad_direccion}</td>
-            <td>${registro.departamento} - ${registro.municipio}</td>
-            <td>${registro.correo}<br>${registro.celular}</td>
+            <td><b>${r.institucion}</b></td>
+            <td>${r.municipio}, ${r.departamento}</td>
             <td>
-                <button onclick="borrarRegistro(${registro.id})" style="background:#dc3545; color:white;">Borrar</button>
+                <div>${r.nombre_completo}</div>
+                <div style="font-size: 0.8em; color: #666;">${r.puesto} - ${r.unidad_direccion}</div>
+            </td>
+            <td>${r.correo}<br><small>${r.celular}</small></td>
+            <td class="actions">
+                <button class="btn-edit" onclick="abrirEditar(${r.id})">✏️</button>
+                <button class="btn-delete" onclick="borrar(${r.id})">🗑️</button>
             </td>
         `;
         tbody.appendChild(tr);
     });
 }
 
-async function borrarRegistro(id) {
-    if (confirm('¿Seguro de borrar este registro?')) {
-        await fetch(`/api/delete-registro?id=${id}`, {
-            headers: { 'x-admin-password': passwordGuardada }
-        });
-        // Recargar datos simulando login
-        checkLogin(); 
+function abrirEditar(id) {
+    const r = registrosGlobal.find(x => x.id === id);
+    document.getElementById('editId').value = r.id;
+    document.getElementById('editNombre').value = r.nombre_completo;
+    document.getElementById('editPuesto').value = r.puesto;
+    document.getElementById('editCorreo').value = r.correo;
+    document.getElementById('editCelular').value = r.celular;
+    document.getElementById('modalEdit').style.display = 'flex';
+}
+
+function cerrarModal() { document.getElementById('modalEdit').style.display = 'none'; }
+
+async function guardarEdicion() {
+    const id = document.getElementById('editId').value;
+    // Solo editamos algunos campos en este ejemplo simplificado
+    const rOriginal = registrosGlobal.find(x => x.id == id);
+    
+    const body = {
+        id: id,
+        ...rOriginal, // mantenemos datos viejos
+        nombre: document.getElementById('editNombre').value,
+        puesto: document.getElementById('editPuesto').value,
+        correo: document.getElementById('editCorreo').value,
+        celular: document.getElementById('editCelular').value,
+    };
+
+    await fetch('/api/update-registro', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body)
+    });
+    
+    cerrarModal();
+    cargarDatos();
+    Swal.fire('Actualizado', '', 'success');
+}
+
+async function borrar(id) {
+    if (confirm('¿Seguro de borrar?')) {
+        await fetch(`/api/delete-registro?id=${id}`);
+        cargarDatos();
     }
+}
+
+function exportarExcel() {
+    // Limpiamos los datos para que el Excel se vea bien
+    const datosLimpios = registrosGlobal.map(r => ({
+        Institucion: r.institucion,
+        Departamento: r.departamento,
+        Municipio: r.municipio,
+        Nombre: r.nombre_completo,
+        Puesto: r.puesto,
+        Unidad: r.unidad_direccion,
+        Correo: r.correo,
+        Celular: r.celular
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(datosLimpios);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Directorio");
+    XLSX.writeFile(wb, "Mano_a_Mano_2026.xlsx");
 }
