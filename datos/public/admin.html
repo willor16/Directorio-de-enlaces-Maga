@@ -13,27 +13,33 @@
         .gestion-box { background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd; }
         .lista-items { padding-left: 20px; max-height: 150px; overflow-y: auto; }
         .lista-items li { margin-bottom: 5px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;}
-        .btn-excel { background-color: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-right: 10px;}
         
-        /* Estilos de la tarjeta de login */
-        .login-card {
-            max-width: 400px;
-            margin: 60px auto;
-            padding: 30px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            text-align: center;
+        /* Estilos nuevos para las tablas separadas */
+        .tabla-institucion-container {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--azul-gob); /* Un toque de color arriba */
         }
-        .login-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 16px;
+        .header-institucion {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
         }
+        .titulo-inst { margin: 0; color: #333; text-transform: uppercase; font-size: 1.2em; }
+        
+        /* Botones */
+        .btn-excel { background-color: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px;}
+        .btn-excel:hover { background-color: #218838; }
+        
+        /* Login styles (igual que antes) */
+        .login-card { max-width: 400px; margin: 60px auto; padding: 30px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+        .login-input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -43,74 +49,57 @@
             <img src="logo1.jpeg" alt="Logo 1" style="max-height: 80px; width: auto;">
             <img src="logo2.jpeg" alt="Logo 2" style="max-height: 80px; width: auto;">
         </div>
-
         <h2 style="margin-bottom: 25px; color: #333;">Acceso Administrativo</h2>
-        
         <input type="password" id="passwordInput" placeholder="Contraseña" class="login-input">
-        
-        <button onclick="checkLogin()" class="btn-primary" style="width: 100%; padding: 12px; font-size: 18px; border-radius: 6px; cursor: pointer;">
-            Entrar
-        </button>
+        <button onclick="checkLogin()" class="btn-primary" style="width: 100%; padding: 12px; font-size: 18px; border-radius: 6px; cursor: pointer;">Entrar</button>
     </div>
 
-    <div id="dashboard" style="display: none; max-width: 1200px; margin: 0 auto; padding: 20px; background: #fff; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <div id="dashboard" style="display: none; max-width: 1200px; margin: 0 auto; padding: 20px;">
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Panel de Control</h2>
-            <div>
-                <button onclick="exportarExcel()" class="btn-excel">📥 Exportar a Excel</button>
-                <button onclick="cerrarSesion()" style="background-color: #dc3545; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 5px;">Cerrar Sesión</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px;">
+            <h2 style="margin:0;">Panel de Control</h2>
+            <div style="display:flex; gap:10px;">
+                <button onclick="exportarTodoGlobal()" class="btn-excel" style="font-size:1.1em; padding: 10px 20px;">
+                    📥 Exportar TODO (Segmentado)
+                </button>
+                <button onclick="cerrarSesion()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px;">
+                    Cerrar Sesión
+                </button>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
             <div class="gestion-box">
                 <h3>Instituciones</h3>
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
                     <input type="text" id="inputInstitucion" placeholder="Nueva..." style="flex:1; padding: 8px;">
-                    <button onclick="agregarItem('institucion')" style="padding: 0 15px; cursor: pointer;">+</button>
+                    <button onclick="agregarItem('institucion')" style="padding: 0 15px;">+</button>
                 </div>
                 <ul id="listaInstituciones" class="lista-items"></ul>
             </div>
-
             <div class="gestion-box">
                 <h3>Departamentos</h3>
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
                     <input type="text" id="inputDepartamento" placeholder="Nuevo..." style="flex:1; padding: 8px;">
-                    <button onclick="agregarItem('departamento')" style="padding: 0 15px; cursor: pointer;">+</button>
+                    <button onclick="agregarItem('departamento')" style="padding: 0 15px;">+</button>
                 </div>
                 <ul id="listaDepartamentos" class="lista-items"></ul>
             </div>
-
             <div class="gestion-box">
                 <h3>Municipios</h3>
                 <select id="selectDeptoParaMuni" style="width: 100%; margin-bottom: 5px; padding: 8px;"></select>
                 <div style="display: flex; gap: 5px; margin-bottom: 10px;">
                     <input type="text" id="inputMunicipio" placeholder="Nuevo..." style="flex:1; padding: 8px;">
-                    <button onclick="agregarItem('municipio')" style="padding: 0 15px; cursor: pointer;">+</button>
+                    <button onclick="agregarItem('municipio')" style="padding: 0 15px;">+</button>
                 </div>
                 <ul id="listaMunicipios" class="lista-items"></ul>
             </div>
         </div>
 
-        <hr>
-        <h3>Registros Guardados</h3>
-        <div style="overflow-x: auto;">
-            <table id="tablaRegistros" border="1" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                <thead style="background: #f4f4f4;">
-                    <tr>
-                        <th style="padding: 10px;">ID</th>
-                        <th style="padding: 10px;">Nombre</th>
-                        <th style="padding: 10px;">Puesto</th>
-                        <th style="padding: 10px;">Unidad</th>
-                        <th style="padding: 10px;">Ubicación</th>
-                        <th style="padding: 10px;">Contacto</th>
-                        <th style="padding: 10px;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaCuerpo"></tbody>
-            </table>
-        </div>
+        <hr style="margin-bottom: 30px;">
+
+        <div id="contenedorTablas"></div>
+
     </div>
 
     <script src="admin.js"></script>
