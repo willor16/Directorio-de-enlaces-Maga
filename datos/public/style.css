@@ -1,28 +1,24 @@
 /* =========================================================
-   1. VARIABLES GLOBALES Y PALETA DE COLORES (AZUL MÁS OSCURO)
+   1. VARIABLES Y COLORES (SERIOS Y OSCUROS)
    ========================================================= */
 :root {
-    /* COLORES: Azul más oscuro y serio */
-    --azul-gob: #003366; /* Azul Marino Profundo */
-    --azul-profundo: #001a33; /* Casi negro azulado */
-    --azul-claro: #eef6fc;
+    /* COLORES INSTITUCIONALES */
+    --azul-gob: #003366;       /* Azul Marino Profundo (Cabeceras) */
+    --azul-oscuro: #001a33;    /* Casi negro (Textos) */
+    --gris-fondo: #f4f6f9;     /* Gris muy claro para el fondo inferior */
     
-    /* GRADIENTES */
-    --gradiente-azul: linear-gradient(135deg, #003366 0%, #001a33 100%);
-    --gradiente-verde-excel: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-    --gradiente-amarillo: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    /* COLORES DE ACCIÓN */
+    --verde-excel: #218838;    /* Verde Excel Clásico */
+    --amarillo-btn: #ffc107;   /* Amarillo Actualizar */
     
-    /* SOMBRAS Y EFECTOS */
-    --sombra-flotante: 0 20px 40px rgba(0, 20, 40, 0.2);
-    --sombra-suave: 0 8px 16px rgba(0,0,0,0.05);
-    
-    /* VIDRIO */
-    --blanco-vidrio: rgba(255, 255, 255, 0.95);
-    --borde-vidrio: 1px solid rgba(255, 255, 255, 0.8);
+    /* EFECTOS VISUALES */
+    --sombra-tarjeta: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --sombra-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --borde-sutil: 1px solid #e1e4e8;
 }
 
 /* =========================================================
-   2. CUERPO Y FONDO ANIMADO
+   2. CUERPO Y FONDO (DISEÑO "SPLIT" SIN ANIMACIÓN)
    ========================================================= */
 body {
     font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
@@ -31,274 +27,352 @@ body {
     color: #333;
     min-height: 100vh;
     
-    /* Fondo Animado Mejorado */
-    background: linear-gradient(-45deg, #cfdef3, #e0eafc, #f5f7fa, #ffffff);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-}
-
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    /* FONDO DIVIDIDO: Azul arriba, Gris abajo. Estático y Profesional. */
+    background: linear-gradient(180deg, var(--azul-gob) 380px, var(--gris-fondo) 380px);
+    background-attachment: fixed; /* El fondo se queda quieto al hacer scroll */
 }
 
 /* =========================================================
-   3. CONTENEDOR PRINCIPAL (ANIMACIÓN SUAVE)
+   3. CONTENEDOR PRINCIPAL
    ========================================================= */
 .container {
     max-width: 950px;
     margin: 0 auto;
-    background-color: var(--blanco-vidrio);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: 50px;
-    border-radius: 24px;
-    border: var(--borde-vidrio);
-    box-shadow: var(--sombra-flotante);
-    position: relative;
     
-    /* Animación de entrada más elegante */
-    opacity: 0; 
-    transform: translateY(30px);
-    animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-@keyframes slideUp { 
-    to { opacity: 1; transform: translateY(0); } 
+    /* Tarjeta blanca sólida sobre el fondo dividido */
+    background-color: #ffffff;
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: var(--sombra-tarjeta);
+    position: relative;
+    border: var(--borde-sutil);
+    
+    /* SIN ANIMACIONES DE ENTRADA */
 }
 
 /* =========================================================
-   4. ENCABEZADOS Y TÍTULOS
+   4. ENCABEZADOS
    ========================================================= */
 .header-area { 
-    display: flex; justify-content: center; align-items: center; gap: 30px; margin-bottom: 30px; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 30px; 
+    margin-bottom: 30px; 
 }
+
 .header-area img { 
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); 
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    max-height: 90px;
+    width: auto;
+    /* Micro-interacción rápida al pasar el mouse */
+    transition: transform 0.2s ease; 
 }
-.header-area img:hover { transform: scale(1.1); }
+.header-area img:hover { transform: scale(1.05); }
 
 h1 {
     text-align: center;
-    background: var(--gradiente-azul);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--azul-gob); /* Color sólido, no degradado */
     margin: 15px 0;
-    font-size: 2.5em;
-    font-weight: 900;
-    letter-spacing: -0.5px;
+    font-size: 2.2em;
+    font-weight: 800;
 }
 
 .subtitle {
     text-align: center;
-    color: #555;
+    color: #666;
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: 500;
     margin-bottom: 45px;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
 }
 
 /* =========================================================
-   5. FORMULARIOS (DARKER TEXT)
+   5. FORMULARIOS (LIMPIOS Y CLAROS)
    ========================================================= */
 .form-group { margin-bottom: 25px; }
 
 label {
-    display: block; margin-bottom: 10px; font-weight: 800; 
-    color: var(--azul-gob); /* Azul oscuro */
-    font-size: 0.95em; padding-left: 5px;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: var(--azul-gob);
+    font-size: 0.95em;
 }
 
 input, select {
-    width: 100%; padding: 16px 20px;
-    border: 2px solid transparent; border-radius: 12px;
-    font-size: 16px; background: #f0f4f8; color: #222;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-    transition: all 0.3s ease; box-sizing: border-box;
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #dde2e8; /* Borde gris suave */
+    border-radius: 8px;
+    font-size: 16px;
+    background: #fdfdfd;
+    color: #333;
+    box-sizing: border-box;
+    /* Transición muy rápida solo para el color del borde */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input:focus, select:focus {
-    background: #ffffff; border-color: var(--azul-gob);
-    box-shadow: 0 0 0 5px rgba(0, 51, 102, 0.15); /* Sombra azul oscuro */
-    outline: none; transform: translateY(-2px);
+    background: #fff;
+    border-color: var(--azul-gob);
+    box-shadow: 0 0 0 4px rgba(0, 51, 102, 0.1);
+    outline: none;
 }
 
 /* =========================================================
-   6. BOTONES
+   6. BOTONES (COLORES SÓLIDOS Y FUERTES)
    ========================================================= */
 
-/* A. BOTÓN PRINCIPAL (AZUL OSCURO) */
+/* A. Botón Guardar (Azul Oscuro) */
 .btn-primary {
-    background: var(--gradiente-azul);
-    color: white; border: none; padding: 20px; width: 100%;
-    font-size: 18px; font-weight: 800; border-radius: 15px;
-    cursor: pointer; margin-top: 35px; text-transform: uppercase; letter-spacing: 1px;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 10px 20px rgba(0, 51, 102, 0.3);
-}
-.btn-primary:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 51, 102, 0.4);
+    background-color: var(--azul-gob);
+    color: white;
+    border: none;
+    padding: 18px;
+    width: 100%;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 35px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* B. BOTÓN EXPORTAR EXCEL (EL QUE NO SE VEÍA BIEN) */
-/* Usamos selectores muy específicos para asegurar que se vea verde */
+.btn-primary:hover {
+    background-color: #002244; /* Un tono más oscuro al hover */
+    transform: translateY(-2px);
+}
+
+/* B. Botón Exportar Excel (VERDE PURO) */
 #dashboard .btn-excel, .btn-excel {
-    background: var(--gradiente-verde-excel) !important;
+    background-color: var(--verde-excel) !important;
     color: white !important;
     border: none !important;
     padding: 10px 25px !important;
-    border-radius: 50px !important;
-    font-size: 0.95em !important;
-    font-weight: 800 !important;
+    border-radius: 6px !important; /* Menos redondeado, más botón */
+    font-size: 15px !important;
+    font-weight: 700 !important;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4) !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
     display: inline-flex !important;
     align-items: center;
     gap: 8px;
-    transition: all 0.3s ease !important;
     text-decoration: none !important;
-    line-height: normal;
+    transition: background-color 0.2s ease !important;
 }
 
 #dashboard .btn-excel:hover, .btn-excel:hover {
-    transform: translateY(-3px) !important;
-    background: linear-gradient(135deg, #34ce57, #28a745) !important;
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.6) !important;
+    background-color: #1a6b2e !important; /* Verde más oscuro */
+    transform: translateY(-2px) !important;
 }
 
-/* C. BOTÓN ADMIN (VERDE FLOTANTE) */
+/* C. Botón Admin Top (Acceso Superior) */
 .btn-admin-top {
-    position: absolute; top: 40px; right: 40px;
-    background: rgba(255,255,255,0.9);
-    color: #28a745; padding: 12px 25px; border-radius: 50px;
-    font-weight: 800; text-decoration: none; border: 2px solid #28a745;
-    transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    z-index: 50; display: flex; align-items: center; gap: 8px;
-}
-.btn-admin-top:hover {
-    background: #28a745; color: white; transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    background: white;
+    color: var(--azul-gob);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    text-decoration: none;
+    border: 2px solid var(--azul-gob);
+    transition: all 0.2s ease;
+    font-size: 0.9em;
+    display: flex; align-items: center; gap: 8px;
+    z-index: 50;
 }
 
-/* D. BOTÓN ACTUALIZAR (AMARILLO) */
-.btn-actualizar {
-    background: var(--gradiente-amarillo);
-    color: #332b00; /* Texto oscuro para contraste */
-    border: none; padding: 8px 20px; border-radius: 50px;
-    font-weight: 800; font-size: 0.85em; text-transform: uppercase;
-    box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
-    cursor: pointer; transition: all 0.3s;
+.btn-admin-top:hover {
+    background: var(--azul-gob);
+    color: white;
+    transform: translateY(-2px);
 }
+
+/* D. Botón Actualizar (Amarillo) */
+.btn-actualizar {
+    background-color: var(--amarillo-btn);
+    color: #332b00;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
 .btn-actualizar:hover {
-    background: #ffdb6c; transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(255, 193, 7, 0.5);
+    background-color: #e0a800;
 }
 
 /* =========================================================
-   7. TABLAS, LISTAS Y ACORDEÓN
+   7. TABLAS Y LISTAS
    ========================================================= */
-details.lista-desplegable, .tabla-institucion-container {
-    margin-bottom: 25px; border-radius: 15px; overflow: hidden;
-    background: white; box-shadow: var(--sombra-suave);
-    border: 1px solid rgba(0,0,0,0.05); transition: all 0.3s;
+details.lista-desplegable, 
+.tabla-institucion-container {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    /* Sin animación de entrada */
 }
-details.lista-desplegable:hover { transform: translateY(-3px); box-shadow: var(--sombra-hover); }
 
 summary {
-    background: white; padding: 20px 25px;
-    color: var(--azul-profundo); /* Azul oscuro */
-    font-weight: 800; font-size: 1.1em;
-    border-left: 6px solid var(--azul-gob);
-    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-    transition: background 0.3s; outline: none;
+    background: #fcfcfc;
+    padding: 18px 25px;
+    color: var(--azul-gob);
+    font-weight: 700;
+    font-size: 1.05em;
+    border-left: 5px solid var(--azul-gob);
+    cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: background 0.2s;
 }
-summary:hover { background: #f8fbff; }
-summary::after { content: '+'; color: var(--azul-gob); font-size: 1.5em; font-weight: 900; }
-details[open] summary::after { content: '-'; transform: rotate(180deg); }
 
-/* TABLAS INTERNAS */
-.tabla-responsive { overflow-x: auto; border-top: 1px solid #eee; }
+summary:hover {
+    background: #f0f7ff;
+}
+
+/* Icono simple */
+summary::after { 
+    content: '+'; 
+    color: var(--azul-gob); 
+    font-size: 1.4em; 
+    font-weight: bold; 
+}
+details[open] summary::after { 
+    content: '-'; 
+}
+
+/* Tabla interna */
+.tabla-responsive { 
+    overflow-x: auto; 
+    border-top: 1px solid #eee;
+}
+
 table { width: 100%; border-collapse: collapse; background: white; }
-th {
-    background: #f1f5f9; color: var(--azul-profundo);
-    padding: 16px 20px; text-transform: uppercase; font-size: 0.85em;
-    letter-spacing: 1px; border-bottom: 2px solid #e2e8f0; text-align: left;
-}
-td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; color: #333; vertical-align: middle; }
-tbody tr { transition: 0.2s; }
-tbody tr:hover { background-color: #f0f8ff; }
 
-/* BADGES */
+th {
+    background: #f1f5f9;
+    color: var(--azul-gob);
+    padding: 12px 20px;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+    text-align: left;
+}
+
+td {
+    padding: 12px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #444;
+    vertical-align: middle;
+}
+
+/* Hover fila simple */
+tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Badges */
 .badge {
-    background: var(--azul-claro); color: var(--azul-gob);
-    padding: 5px 12px; border-radius: 30px; font-weight: 800;
-    font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px;
+    background: #e3f2fd;
+    color: var(--azul-gob);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.75em;
+    text-transform: uppercase;
 }
 
 /* =========================================================
-   8. LOGIN Y PANEL DE CONTROL
+   8. LOGIN ADMIN Y PANEL DE CONTROL
    ========================================================= */
+/* Login Card: Flota sobre el fondo azul */
 .login-card {
-    max-width: 420px; margin: 80px auto; padding: 40px;
-    background: rgba(255, 255, 255, 0.9); border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); text-align: center;
-    backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.6);
-    position: relative; overflow: hidden; animation: popIn 0.6s ease-out;
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    position: relative;
+    border: none;
+    /* Sin animación popIn */
 }
-@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: var(--gradiente-azul); }
-.login-card h2 { color: var(--azul-profundo); margin-bottom: 30px; font-size: 1.8em; }
 
-/* HEADER DASHBOARD AZUL */
+.login-card h2 { 
+    color: var(--azul-gob); 
+    margin-bottom: 25px; 
+    font-size: 1.8em; 
+}
+
+/* Dashboard Header */
 #dashboard > div:first-child {
-    background: var(--gradiente-azul) !important;
-    color: white; padding: 25px !important; border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0, 42, 77, 0.3); margin-bottom: 30px;
+    background-color: var(--azul-gob) !important; /* Azul sólido */
+    color: white; 
+    padding: 20px 25px !important; 
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+    margin-bottom: 30px;
     display: flex; justify-content: space-between; align-items: center;
 }
 #dashboard h2 { color: white !important; margin: 0; }
 
-/* CAJAS DE GESTIÓN */
+/* Cajas de Gestión */
 .gestion-box {
-    background: white; padding: 25px; border-radius: 16px;
-    box-shadow: var(--sombra-suave); border: 1px solid #eee;
-    transition: all 0.3s; position: relative;
+    background: white; 
+    padding: 20px; 
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+    border: 1px solid #eee;
+    transition: transform 0.2s;
 }
-.gestion-box:hover { transform: translateY(-5px); box-shadow: var(--sombra-hover); }
-/* Colores superiores de las cajas */
-.gestion-box:nth-child(1) { border-top: 5px solid #003366; }
-.gestion-box:nth-child(2) { border-top: 5px solid #5a32a3; }
-.gestion-box:nth-child(3) { border-top: 5px solid #c2185b; }
 
-.gestion-box h3 { margin-top: 0; color: var(--azul-profundo); }
+.gestion-box:hover { transform: translateY(-3px); }
+
+/* Colores superiores */
+.gestion-box:nth-child(1) { border-top: 4px solid #003366; }
+.gestion-box:nth-child(2) { border-top: 4px solid #004d40; }
+.gestion-box:nth-child(3) { border-top: 4px solid #b71c1c; }
+
+.gestion-box h3 { margin-top: 0; color: #333; }
+
 .gestion-box button {
-    background: var(--azul-gob); color: white; border: none; border-radius: 8px;
-    font-weight: bold; padding: 10px 15px; cursor: pointer; transition: 0.2s;
+    background: var(--azul-gob); 
+    color: white; 
+    border: none; 
+    border-radius: 6px;
+    font-weight: bold; 
+    padding: 8px 12px; 
+    cursor: pointer; 
 }
-.gestion-box button:hover { transform: scale(1.1); background: var(--azul-profundo); }
+.gestion-box button:hover { background: #002244; }
 
 /* =========================================================
    9. CAMPANITA Y RESPONSIVO
    ========================================================= */
 #btnBell {
     display: none; position: fixed; top: 25px; right: 25px; z-index: 2000;
-    background: white; border: none; border-radius: 50%; width: 55px; height: 55px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2); cursor: pointer; font-size: 26px; transition: 0.3s;
+    background: white; border: none; border-radius: 50%; width: 50px; height: 50px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2); cursor: pointer; font-size: 24px;
 }
-#btnBell:hover { transform: rotate(15deg) scale(1.1); }
 .notificacion-activa::after {
-    content: ''; position: absolute; top: 2px; right: 2px; width: 14px; height: 14px;
-    background: #ff3b30; border: 3px solid white; border-radius: 50%; animation: pulse 2s infinite;
-}
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+    content: ''; position: absolute; top: 2px; right: 2px; width: 12px; height: 12px;
+    background: #dc3545; border: 2px solid white; border-radius: 50%;
 }
 
 @media (max-width: 600px) {
