@@ -22,7 +22,7 @@
 }
 
 /* =========================================================
-   2. CUERPO Y FONDO ANIMADO
+   2. CUERPO Y FONDO ANIMADO (LIGERAMENTE MÁS OSCURO)
    ========================================================= */
 body {
     font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
@@ -31,8 +31,8 @@ body {
     color: #333;
     min-height: 100vh;
     
-    /* Fondo Animado Mejorado */
-    background: linear-gradient(-45deg, #cfdef3, #e0eafc, #f5f7fa, #ffffff);
+    /* Fondo Animado: Tonos ajustados para ser menos brillantes/blancos */
+    background: linear-gradient(-45deg, #aebcd6, #c5d3e8, #dce4ed, #e6e9f0);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
 }
@@ -44,7 +44,7 @@ body {
 }
 
 /* =========================================================
-   3. CONTENEDOR PRINCIPAL (ANIMACIÓN SUAVE)
+   3. CONTENEDOR PRINCIPAL
    ========================================================= */
 .container {
     max-width: 950px;
@@ -54,7 +54,10 @@ body {
     -webkit-backdrop-filter: blur(20px);
     padding: 50px;
     border-radius: 24px;
-    border: var(--borde-vidrio);
+    
+    /* CAMBIO: Borde sutil del mismo azul institucional */
+    border: 1px solid var(--azul-gob);
+    
     box-shadow: var(--sombra-flotante);
     position: relative;
     
@@ -102,7 +105,7 @@ h1 {
 }
 
 /* =========================================================
-   5. FORMULARIOS (DARKER TEXT)
+   5. FORMULARIOS
    ========================================================= */
 .form-group { margin-bottom: 25px; }
 
@@ -144,8 +147,7 @@ input:focus, select:focus {
     box-shadow: 0 20px 40px rgba(0, 51, 102, 0.4);
 }
 
-/* B. BOTÓN EXPORTAR EXCEL (EL QUE NO SE VEÍA BIEN) */
-/* Usamos selectores muy específicos para asegurar que se vea verde */
+/* B. BOTÓN EXPORTAR EXCEL */
 #dashboard .btn-excel, .btn-excel {
     background: var(--gradiente-verde-excel) !important;
     color: white !important;
@@ -263,17 +265,30 @@ tbody tr:hover { background-color: #f0f8ff; }
 }
 #dashboard h2 { color: white !important; margin: 0; }
 
-/* CAJAS DE GESTIÓN */
+/* CAJAS DE GESTIÓN (ADMIN) */
 .gestion-box {
     background: white; padding: 25px; border-radius: 16px;
     box-shadow: var(--sombra-suave); border: 1px solid #eee;
     transition: all 0.3s; position: relative;
 }
 .gestion-box:hover { transform: translateY(-5px); box-shadow: var(--sombra-hover); }
-/* Colores superiores de las cajas */
-.gestion-box:nth-child(1) { border-top: 5px solid #003366; }
-.gestion-box:nth-child(2) { border-top: 5px solid #5a32a3; }
-.gestion-box:nth-child(3) { border-top: 5px solid #c2185b; }
+
+/* CAMBIO: Colores superiores e inferiores (Rojo, Azul, Verde) */
+/* Caja 1: Azul */
+.gestion-box:nth-child(1) { 
+    border-top: 5px solid #003366; 
+    border-bottom: 5px solid #003366; 
+}
+/* Caja 2: Rojo */
+.gestion-box:nth-child(2) { 
+    border-top: 5px solid #dc3545; 
+    border-bottom: 5px solid #dc3545; 
+}
+/* Caja 3: Verde */
+.gestion-box:nth-child(3) { 
+    border-top: 5px solid #28a745; 
+    border-bottom: 5px solid #28a745; 
+}
 
 .gestion-box h3 { margin-top: 0; color: var(--azul-profundo); }
 .gestion-box button {
