@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Directorio de Enlaces - Mano a Mano</title>
+    <title>Directorio de Enlaces</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
     <div class="container">
-        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 25px;">
-            <img src="logo1.jpeg" alt="Logo Izquierda" style="max-height: 100px; width: auto; object-fit: contain;">
-            <img src="logo2.jpeg" alt="Logo Derecha" style="max-height: 100px; width: auto; object-fit: contain;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px;">
+            <img src="logo1.jpg" alt="Logo Izquierda" style="max-height: 100px; width: auto;">
+            <img src="logo2.jpg" alt="Logo Derecha" style="max-height: 100px; width: auto;">
         </div>
 
         <h2>Registro de Datos</h2>
         
         <form id="registroForm">
-            
             <label for="institucion">Institución:</label>
             <select id="institucion" name="institucion" required>
-                <option value="" disabled selected>Cargando lista...</option>
+                <option value="" disabled selected>Cargando instituciones...</option>
             </select>
 
             <label for="departamento">Departamento:</label>
             <select id="departamento" name="departamento" required onchange="cargarMunicipios()">
-                <option value="" disabled selected>Cargando lista...</option>
+                <option value="" disabled selected>Cargando departamentos...</option>
             </select>
 
             <label for="municipio">Municipio:</label>
@@ -44,17 +43,13 @@
             <input type="text" id="unidad" name="unidad" placeholder="Ej: Dirección de Planificación">
 
             <label for="correo">Correo Electrónico:</label>
-            <input type="email" id="correo" name="correo" required placeholder="ejemplo@institucion.gob.gt">
+            <input type="email" id="correo" name="correo" required placeholder="ejemplo@maga.gob.gt">
 
             <label for="celular">Número de Celular:</label>
             <input type="tel" id="celular" name="celular" placeholder="Ej: 5555-5555">
 
             <button type="submit">Guardar Registro</button>
         </form>
-        
-        <p style="text-align: center; margin-top: 20px; font-size: 0.9em; color: #666;">
-            <a href="/admin" style="color: #666; text-decoration: none;">Acceso Administrativo</a>
-        </p>
     </div>
 
     <script src="app.js"></script>
