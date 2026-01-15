@@ -1,39 +1,68 @@
-const lugares = {
-    "Sololá": ["Sololá", "Concepción", "Nahualá", "Panajachel"],
-    "Quetzaltenango": ["Quetzaltenango", "Salcajá", "Olintepeque"],
-    "Totonicapán": ["Totonicapán", "San Cristóbal"]
-    // Agrega tus 15 departamentos aquí
-};
-
-// Cargar departamentos al inicio
-const deptoSelect = document.getElementById('departamento');
-Object.keys(lugares).forEach(d => {
-    const opt = document.createElement('option');
-    opt.value = d; opt.innerText = d;
-    deptoSelect.appendChild(opt);
+// 1. CARGA INICIAL DESDE API (Reemplaza al objeto 'lugares')
+document.addEventListener('DOMContentLoaded', async () => {
+    await cargarSelect('/api/listas?tipo=institucion', 'institucion');
+    await cargarSelect('/api/listas?tipo=departamento', 'departamento');
 });
 
-function cargarMunicipios() {
-    const muniSelect = document.getElementById('municipio');
-    const depto = deptoSelect.value;
-    muniSelect.innerHTML = '<option value="">Seleccione...</option>';
-    
-    if (depto && lugares[depto]) {
-        muniSelect.disabled = false;
-        lugares[depto].forEach(m => {
+// Función auxiliar para llenar los selects sin borrar tu estilo
+async function cargarSelect(url, idElemento) {
+    try {
+        const res = await fetch(url);
+        const datos = await res.json();
+        const select = document.getElementById(idElemento);
+        
+        // Limpiamos dejando solo la opción por defecto
+        select.innerHTML = '<option value="" disabled selected>Seleccione...</option>';
+        
+        datos.forEach(item => {
             const opt = document.createElement('option');
-            opt.value = m; opt.innerText = m;
-            muniSelect.appendChild(opt);
+            opt.value = item.valor;
+            opt.innerText = item.valor;
+            select.appendChild(opt);
         });
-    } else {
-        muniSelect.disabled = true;
+    } catch (error) {
+        console.error("Error cargando lista:", error);
     }
 }
 
+// 2. CARGA DE MUNICIPIOS (Global para que el HTML la vea)
+window.cargarMunicipios = async function() {
+    const deptoSelect = document.getElementById('departamento');
+    const muniSelect = document.getElementById('municipio');
+    const depto = deptoSelect.value;
+
+    muniSelect.innerHTML = '<option value="">Cargando...</option>';
+    muniSelect.disabled = true;
+
+    if (depto) {
+        try {
+            const res = await fetch(`/api/listas?tipo=municipio&padre=${depto}`);
+            const datos = await res.json();
+
+            muniSelect.innerHTML = '<option value="" disabled selected>Seleccione...</option>';
+            
+            datos.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.valor;
+                opt.innerText = item.valor;
+                muniSelect.appendChild(opt);
+            });
+            muniSelect.disabled = false;
+        } catch (err) {
+            console.error(err);
+            muniSelect.innerHTML = '<option value="">Error al cargar</option>';
+        }
+    }
+};
+
+// 3. TU LÓGICA DE ENVÍO ORIGINAL
 document.getElementById('registroForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('btnGuardar');
-    btn.innerText = "Guardando..."; btn.disabled = true;
+    const textoOriginal = btn.innerText;
+    
+    btn.innerText = "Guardando..."; 
+    btn.disabled = true;
 
     const data = {
         institucion: document.getElementById('institucion').value,
@@ -56,6 +85,7 @@ document.getElementById('registroForm').addEventListener('submit', async (e) => 
         if (res.ok) {
             Swal.fire('¡Éxito!', 'Registro guardado correctamente', 'success');
             document.getElementById('registroForm').reset();
+            document.getElementById('municipio').disabled = true;
         } else {
             Swal.fire('Error', 'No se pudo guardar', 'error');
         }
@@ -63,5 +93,7 @@ document.getElementById('registroForm').addEventListener('submit', async (e) => 
         console.error(err);
         Swal.fire('Error', 'Error de conexión', 'error');
     }
-    btn.innerText = "GUARDAR REGISTRO"; btn.disabled = false;
+    
+    btn.innerText = textoOriginal; 
+    btn.disabled = false;
 });
