@@ -24,7 +24,7 @@ function cerrarSesion() {
     window.location.href = "/";
 }
 
-// --- SIDEBAR Y SOLICITUDES ---
+// --- SIDEBAR DE SOLICITUDES ---
 window.toggleSidebar = function() {
     const sb = document.getElementById('sidebarSolicitudes');
     if (sb.style.right === '0px') sb.style.right = '-400px';
@@ -38,10 +38,7 @@ async function cargarSolicitudesPendientes() {
     const contenedor = document.getElementById('listaSolicitudes');
     contenedor.innerHTML = '<p>Cargando...</p>';
 
-    if(!passwordGuardada) {
-        contenedor.innerHTML = '<p>Inicia sesión primero.</p>';
-        return;
-    }
+    if(!passwordGuardada) return;
 
     try {
         const res = await fetch('/api/ediciones', { method: 'GET', headers: { 'x-admin-password': passwordGuardada } });
@@ -61,9 +58,9 @@ async function cargarSolicitudesPendientes() {
             card.innerHTML = `
                 <div style="font-weight:bold; margin-bottom:5px; color:#005696;">${nuevos.nombre}</div>
                 <div style="margin-bottom:10px; font-size:0.85em;">
-                    <strong>Cambios:</strong><br>
+                    <strong>Cambios propuestos:</strong><br>
                     ${nuevos.puesto} - ${nuevos.unidad}<br>
-                    ${nuevos.correo} / ${nuevos.celular}
+                    ${nuevos.correo} <br> ${nuevos.celular}
                 </div>
                 <div style="display:flex; gap:5px;">
                     <button onclick='aprobarEdicion(${JSON.stringify(sol)})' style="flex:1; background:#28a745; color:white; border:none; padding:5px; border-radius:4px; cursor:pointer;">✔</button>
@@ -80,13 +77,13 @@ async function aprobarEdicion(solicitud) {
     try {
         const res = await fetch('/api/ediciones', {
             method: 'PUT',
-            headers: { 'x-admin-password': passwordGuardada },
+            headers: { 'x-admin-password': passwordGuardada, 'Content-Type': 'application/json' },
             body: JSON.stringify({ solicitud_id: solicitud.solicitud_id, registro_id: solicitud.id, datos_finales: solicitud.nuevos_datos })
         });
         if(res.ok) {
             Swal.fire('Aprobado', 'Registro actualizado.', 'success');
             cargarSolicitudesPendientes();
-            checkLogin(); // Recargar tablas principales
+            checkLogin(); // Recargar tablas
         }
     } catch(e) { console.error(e); }
 }
@@ -99,7 +96,7 @@ async function rechazarEdicion(id) {
     } catch(e) { console.error(e); }
 }
 
-// --- GESTIÓN LISTAS (Mismo código que antes) ---
+// --- GESTIÓN DE CONFIGURACIÓN ---
 async function cargarConfiguraciones() {
     const res = await fetch('/api/listas'); const datos = await res.json();
     const listaInst = document.getElementById('listaInstituciones'); const listaDepto = document.getElementById('listaDepartamentos'); const listaMuni = document.getElementById('listaMunicipios'); const selectDepto = document.getElementById('selectDeptoParaMuni');
@@ -127,26 +124,64 @@ async function agregarItem(categoria) {
 async function borrarItem(id) { if (confirm('¿Eliminar?')) { await fetch(`/api/listas?id=${id}`, { method: 'DELETE', headers: { 'x-admin-password': passwordGuardada } }); cargarConfiguraciones(); } }
 async function borrarRegistro(id) { if (confirm('¿Seguro?')) { await fetch(`/api/delete-registro?id=${id}`, { headers: { 'x-admin-password': passwordGuardada } }); checkLogin(); } }
 
-// --- TABLAS Y EXCEL ---
+// --- VISUALIZACIÓN ADMIN (ACORDEÓN + TABLA COMPLETA) ---
 function cargarRegistrosPorInstitucion(registros) {
-    const contenedor = document.getElementById('contenedorTablas'); contenedor.innerHTML = '';
+    const contenedor = document.getElementById('contenedorTablas'); 
+    contenedor.innerHTML = '';
     const instituciones = [...new Set(registros.map(r => r.institucion))].sort();
-    if (instituciones.length === 0) { contenedor.innerHTML = '<p style="text-align:center;">No hay registros.</p>'; return; }
+    
+    if (instituciones.length === 0) { 
+        contenedor.innerHTML = '<p style="text-align:center;">No hay registros.</p>'; 
+        return; 
+    }
 
     instituciones.forEach(inst => {
         const registrosInst = registros.filter(r => r.institucion === inst);
-        const div = document.createElement('div'); div.className = 'tabla-institucion-container';
-        div.innerHTML = `
-            <div class="header-institucion"><h3 class="titulo-inst">${inst}</h3><button onclick="exportarExcelUnico('${inst}')" class="btn-excel">📥 Excel ${inst}</button></div>
-            <div style="overflow-x: auto;">
-                <table id="tabla-${inst.replace(/\s/g, '-')}" border="1" style="width: 100%; border-collapse: collapse;">
-                    <thead style="background: #f4f4f4;"><tr><th style="padding:10px;">ID</th><th style="padding:10px;">Nombre</th><th style="padding:10px;">Puesto</th><th style="padding:10px;">Unidad</th><th style="padding:10px;">Ubicación</th><th style="padding:10px;">Contacto</th><th style="padding:10px;">Acciones</th></tr></thead>
+        
+        // Usamos details para el acordeón
+        const details = document.createElement('details');
+        details.className = 'lista-desplegable';
+        
+        // Header Admin: Título + Cantidad + Botón Excel
+        details.innerHTML = `
+            <summary style="outline:none;">
+                <span>${inst} <span style="font-weight:normal; opacity:0.8;">(${registrosInst.length})</span></span>
+                <button onclick="exportarExcelUnico('${inst}')" class="btn-excel" style="margin-left:auto;">📥 Excel</button>
+            </summary>
+            
+            <div style="overflow-x: auto; background:#fff;">
+                <table id="tabla-${inst.replace(/\s/g, '-')}" border="1">
+                    <thead style="background: #f4f4f4;">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Puesto</th>
+                            <th>Unidad</th>
+                            <th>Tipo Enlace</th>
+                            <th>Ubicación</th>
+                            <th>Contacto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        ${registrosInst.map(r => `<tr><td style="padding:8px;">${r.id}</td><td style="padding:8px;">${r.nombre_completo}</td><td style="padding:8px;">${r.puesto}</td><td style="padding:8px;">${r.unidad_direccion}</td><td style="padding:8px;">${r.departamento}${r.municipio ? ' - '+r.municipio : ''}</td><td style="padding:8px;">${r.correo}<br>${r.celular}</td><td style="padding:8px; text-align:center;"><button onclick="borrarRegistro(${r.id})" style="background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">Borrar</button></td></tr>`).join('')}
+                        ${registrosInst.map(r => `
+                            <tr>
+                                <td>${r.id}</td>
+                                <td>${r.nombre_completo}</td>
+                                <td>${r.puesto}</td>
+                                <td>${r.unidad_direccion}</td>
+                                <td style="color:#005696; font-weight:bold;">${r.tipo_enlace || '-'}</td>
+                                <td>${r.departamento}${r.municipio ? ' - '+r.municipio : ''}</td>
+                                <td>${r.correo}<br>${r.celular}</td>
+                                <td style="text-align:center;">
+                                    <button onclick="borrarRegistro(${r.id})" style="background:#dc3545;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">Borrar</button>
+                                </td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
             </div>`;
-        contenedor.appendChild(div);
+        contenedor.appendChild(details);
     });
 }
 
@@ -161,12 +196,14 @@ function exportarExcelUnico(nombreInst) {
 function exportarTodoGlobal() {
     if (todosLosRegistros.length === 0) return Swal.fire('Aviso', 'Sin datos', 'info');
     let datos = [];
-    const headers = ["ID", "Nombre", "Puesto", "Unidad", "Departamento", "Municipio", "Correo", "Celular"];
+    const headers = ["ID", "Nombre", "Puesto", "Unidad", "Tipo Enlace", "Departamento", "Municipio", "Correo", "Celular"];
     const instituciones = [...new Set(todosLosRegistros.map(r => r.institucion))].sort();
     
     instituciones.forEach(inst => {
         datos.push([`INSTITUCIÓN: ${inst.toUpperCase()}`]); datos.push(headers);
-        todosLosRegistros.filter(r => r.institucion === inst).forEach(r => datos.push([r.id, r.nombre_completo, r.puesto, r.unidad_direccion, r.departamento, r.municipio, r.correo, r.celular]));
+        todosLosRegistros.filter(r => r.institucion === inst).forEach(r => 
+            datos.push([r.id, r.nombre_completo, r.puesto, r.unidad_direccion, r.tipo_enlace, r.departamento, r.municipio, r.correo, r.celular])
+        );
         datos.push([]); datos.push([]);
     });
     const wb = XLSX.utils.book_new();
