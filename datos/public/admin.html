@@ -4,57 +4,53 @@
     <meta charset="UTF-8">
     <title>Admin - Mano a Mano</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        .gestion-box { background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd; }
-        .lista-items { padding-left: 20px; max-height: 150px; overflow-y: auto; }
-        .lista-items li { margin-bottom: 5px; border-bottom: 1px solid #eee; }
-    </style>
 </head>
 <body>
-    <div id="loginScreen" style="text-align: center; margin-top: 50px;">
-        <h2>Acceso Administrativo</h2>
-        <input type="password" id="passwordInput" placeholder="Contraseña">
-        <button onclick="checkLogin()">Entrar</button>
+    <div id="loginScreen" class="container" style="max-width: 400px; text-align: center;">
+        <h2>Acceso Restringido</h2>
+        <input type="password" id="passwordInput" placeholder="Contraseña de Admin" style="margin-bottom: 10px;">
+        <button onclick="checkLogin()" class="btn-primary">Entrar</button>
     </div>
 
-    <div id="dashboard" style="display: none; max-width: 1200px; margin: 0 auto; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Panel de Control</h2>
-            <button onclick="cerrarSesion()" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px;">Cerrar Sesión</button>
+    <div id="dashboard" style="display: none; padding: 20px;">
+        <div class="admin-header">
+            <h2 style="color: var(--azul-gob);">Panel de Control</h2>
+            <button onclick="exportarExcel()" class="btn-export">📥 Descargar Excel</button>
         </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-            <div class="gestion-box">
-                <h3>Instituciones</h3>
-                <input type="text" id="inputInstitucion" placeholder="Nueva Institución">
-                <button onclick="agregarItem('institucion')">+</button>
-                <ul id="listaInstituciones" class="lista-items"></ul>
-            </div>
-            <div class="gestion-box">
-                <h3>Departamentos</h3>
-                <input type="text" id="inputDepartamento" placeholder="Nuevo Depto">
-                <button onclick="agregarItem('departamento')">+</button>
-                <ul id="listaDepartamentos" class="lista-items"></ul>
-            </div>
-            <div class="gestion-box">
-                <h3>Municipios</h3>
-                <select id="selectDeptoParaMuni" style="width: 100%; margin-bottom:5px;"></select>
-                <input type="text" id="inputMunicipio" placeholder="Nuevo Muni">
-                <button onclick="agregarItem('municipio')">+</button>
-                <ul id="listaMunicipios" class="lista-items"></ul>
-            </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; overflow-x: auto;">
+            <table id="tablaRegistros">
+                <thead>
+                    <tr>
+                        <th>Institución</th>
+                        <th>Lugar</th>
+                        <th>Nombre / Puesto</th>
+                        <th>Contacto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
-
-        <hr>
-        <h3>Registros</h3>
-        <table border="1" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr><th>ID</th><th>Nombre</th><th>Puesto</th><th>Unidad</th><th>Ubicación</th><th>Contacto</th><th>Acción</th></tr>
-            </thead>
-            <tbody id="tablaCuerpo"></tbody>
-        </table>
     </div>
+
+    <div id="modalEdit" class="modal">
+        <div class="modal-content">
+            <h3>Editar Registro</h3>
+            <input type="hidden" id="editId">
+            <div class="form-group"><label>Nombre</label><input id="editNombre"></div>
+            <div class="form-group"><label>Puesto</label><input id="editPuesto"></div>
+            <div class="form-group"><label>Correo</label><input id="editCorreo"></div>
+            <div class="form-group"><label>Celular</label><input id="editCelular"></div>
+            <div style="text-align: right; margin-top: 10px;">
+                <button onclick="cerrarModal()" style="padding: 10px;">Cancelar</button>
+                <button onclick="guardarEdicion()" class="btn-primary" style="width: auto;">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <script src="admin.js"></script>
 </body>
 </html>
