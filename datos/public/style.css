@@ -1,39 +1,38 @@
 /* =========================================================
-   1. VARIABLES GLOBALES Y PALETA DE COLORES
+   1. VARIABLES GLOBALES Y PALETA DE COLORES (AZUL MÁS OSCURO)
    ========================================================= */
 :root {
-    /* Colores Institucionales */
-    --azul-gob: #005696;
-    --azul-profundo: #002a4d;
-    --azul-claro: #e3f2fd;
+    /* COLORES: Azul más oscuro y serio */
+    --azul-gob: #003366; /* Azul Marino Profundo */
+    --azul-profundo: #001a33; /* Casi negro azulado */
+    --azul-claro: #eef6fc;
     
-    /* Gradientes */
-    --gradiente-azul: linear-gradient(135deg, #005696 0%, #003366 100%);
+    /* GRADIENTES */
+    --gradiente-azul: linear-gradient(135deg, #003366 0%, #001a33 100%);
     --gradiente-verde-excel: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-    --gradiente-amarillo: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+    --gradiente-amarillo: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
     
-    /* Sombras y Efectos 3D */
-    --sombra-flotante: 0 15px 35px rgba(0, 42, 77, 0.2);
-    --sombra-suave: 0 5px 15px rgba(0,0,0,0.05);
-    --sombra-hover: 0 8px 25px rgba(0,0,0,0.15);
+    /* SOMBRAS Y EFECTOS */
+    --sombra-flotante: 0 20px 40px rgba(0, 20, 40, 0.2);
+    --sombra-suave: 0 8px 16px rgba(0,0,0,0.05);
     
-    /* Efectos de Vidrio (Glassmorphism) */
+    /* VIDRIO */
     --blanco-vidrio: rgba(255, 255, 255, 0.95);
     --borde-vidrio: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 /* =========================================================
-   2. CONFIGURACIÓN DEL CUERPO (BODY) Y FONDO
+   2. CUERPO Y FONDO ANIMADO
    ========================================================= */
 body {
-    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 40px 20px;
-    color: #444;
-    min-height: 100vh; /* Ocupa toda la altura de la pantalla */
+    color: #333;
+    min-height: 100vh;
     
-    /* Fondo Animado "Aurora" */
-    background: linear-gradient(-45deg, #dbeafe, #eff6ff, #e0f2fe, #ffffff);
+    /* Fondo Animado Mejorado */
+    background: linear-gradient(-45deg, #cfdef3, #e0eafc, #f5f7fa, #ffffff);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
 }
@@ -45,27 +44,24 @@ body {
 }
 
 /* =========================================================
-   3. CONTENEDOR PRINCIPAL
+   3. CONTENEDOR PRINCIPAL (ANIMACIÓN SUAVE)
    ========================================================= */
 .container {
     max-width: 950px;
     margin: 0 auto;
-    
-    /* Estilos de Vidrio */
     background-color: var(--blanco-vidrio);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    
     padding: 50px;
     border-radius: 24px;
     border: var(--borde-vidrio);
     box-shadow: var(--sombra-flotante);
     position: relative;
     
-    /* Animación de entrada */
-    animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    /* Animación de entrada más elegante */
     opacity: 0; 
     transform: translateY(30px);
+    animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 @keyframes slideUp { 
@@ -73,464 +69,240 @@ body {
 }
 
 /* =========================================================
-   4. ENCABEZADOS, LOGOS Y TÍTULOS
+   4. ENCABEZADOS Y TÍTULOS
    ========================================================= */
 .header-area { 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    gap: 30px; 
-    margin-bottom: 30px; 
+    display: flex; justify-content: center; align-items: center; gap: 30px; margin-bottom: 30px; 
 }
-
 .header-area img { 
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); 
-    transition: transform 0.3s ease; 
-    max-height: 90px;
-    width: auto;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 }
-
-.header-area img:hover { 
-    transform: scale(1.1); 
-}
+.header-area img:hover { transform: scale(1.1); }
 
 h1 {
     text-align: center;
     background: var(--gradiente-azul);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent; /* Texto con degradado */
+    -webkit-text-fill-color: transparent;
     margin: 15px 0;
     font-size: 2.5em;
     font-weight: 900;
-    letter-spacing: -1px;
-    text-shadow: 0 10px 20px rgba(0, 86, 150, 0.15);
+    letter-spacing: -0.5px;
 }
 
 .subtitle {
     text-align: center;
-    color: #666;
+    color: #555;
     font-size: 1.1em;
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 45px;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
 
 /* =========================================================
-   5. ESTILOS DE FORMULARIO (Inputs y Selects)
+   5. FORMULARIOS (DARKER TEXT)
    ========================================================= */
-.form-group { 
-    margin-bottom: 25px; 
-    position: relative;
-}
+.form-group { margin-bottom: 25px; }
 
 label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 700;
-    color: var(--azul-gob);
-    font-size: 0.95em;
-    padding-left: 5px;
+    display: block; margin-bottom: 10px; font-weight: 800; 
+    color: var(--azul-gob); /* Azul oscuro */
+    font-size: 0.95em; padding-left: 5px;
 }
 
 input, select {
-    width: 100%;
-    padding: 16px 20px;
-    border: 2px solid transparent; /* Sin borde visible por defecto */
-    border-radius: 12px;
-    font-size: 16px;
-    background: #f0f4f8; /* Gris suave */
+    width: 100%; padding: 16px 20px;
+    border: 2px solid transparent; border-radius: 12px;
+    font-size: 16px; background: #f0f4f8; color: #222;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-    color: #333;
+    transition: all 0.3s ease; box-sizing: border-box;
 }
 
 input:focus, select:focus {
-    background: #ffffff;
-    border-color: var(--azul-gob);
-    box-shadow: 0 0 0 5px rgba(0, 86, 150, 0.15); /* Resplandor al escribir */
-    outline: none;
-    transform: translateY(-2px);
+    background: #ffffff; border-color: var(--azul-gob);
+    box-shadow: 0 0 0 5px rgba(0, 51, 102, 0.15); /* Sombra azul oscuro */
+    outline: none; transform: translateY(-2px);
 }
 
 /* =========================================================
-   6. BOTONES (PRINCIPAL, ADMIN, ACTUALIZAR, EXCEL)
+   6. BOTONES
    ========================================================= */
 
-/* A. Botón Principal (GUARDAR REGISTRO) */
+/* A. BOTÓN PRINCIPAL (AZUL OSCURO) */
 .btn-primary {
     background: var(--gradiente-azul);
-    color: white;
-    border: none;
-    padding: 20px;
-    width: 100%;
-    font-size: 18px;
-    font-weight: 800;
-    border-radius: 15px;
-    cursor: pointer;
-    margin-top: 35px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 10px 20px rgba(0, 86, 150, 0.3);
+    color: white; border: none; padding: 20px; width: 100%;
+    font-size: 18px; font-weight: 800; border-radius: 15px;
+    cursor: pointer; margin-top: 35px; text-transform: uppercase; letter-spacing: 1px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 10px 20px rgba(0, 51, 102, 0.3);
 }
-
 .btn-primary:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 86, 150, 0.4);
+    box-shadow: 0 20px 40px rgba(0, 51, 102, 0.4);
 }
 
-.btn-primary:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-/* B. Botón de Acceso Admin (Flotante arriba) */
-.btn-admin-top {
-    position: absolute;
-    top: 40px;
-    right: 40px;
-    background: rgba(255,255,255,0.8);
-    color: #28a745;
-    padding: 12px 25px;
-    border-radius: 50px;
-    font-weight: 800;
-    text-decoration: none;
-    border: 2px solid #28a745;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    z-index: 50;
-    font-size: 0.9em;
-    display: flex;
+/* B. BOTÓN EXPORTAR EXCEL (EL QUE NO SE VEÍA BIEN) */
+/* Usamos selectores muy específicos para asegurar que se vea verde */
+#dashboard .btn-excel, .btn-excel {
+    background: var(--gradiente-verde-excel) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 25px !important;
+    border-radius: 50px !important;
+    font-size: 0.95em !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4) !important;
+    display: inline-flex !important;
     align-items: center;
     gap: 8px;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    line-height: normal;
 }
 
+#dashboard .btn-excel:hover, .btn-excel:hover {
+    transform: translateY(-3px) !important;
+    background: linear-gradient(135deg, #34ce57, #28a745) !important;
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.6) !important;
+}
+
+/* C. BOTÓN ADMIN (VERDE FLOTANTE) */
+.btn-admin-top {
+    position: absolute; top: 40px; right: 40px;
+    background: rgba(255,255,255,0.9);
+    color: #28a745; padding: 12px 25px; border-radius: 50px;
+    font-weight: 800; text-decoration: none; border: 2px solid #28a745;
+    transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    z-index: 50; display: flex; align-items: center; gap: 8px;
+}
 .btn-admin-top:hover {
-    background: #28a745;
-    color: white;
-    transform: translateY(-3px);
+    background: #28a745; color: white; transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
 }
 
-/* C. Botón "Actualizar" (Amarillo) */
+/* D. BOTÓN ACTUALIZAR (AMARILLO) */
 .btn-actualizar {
     background: var(--gradiente-amarillo);
-    color: #4a3b00;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 50px;
-    font-weight: 800;
-    font-size: 0.85em;
-    text-transform: uppercase;
+    color: #332b00; /* Texto oscuro para contraste */
+    border: none; padding: 8px 20px; border-radius: 50px;
+    font-weight: 800; font-size: 0.85em; text-transform: uppercase;
     box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
-    cursor: pointer;
-    transition: all 0.3s;
+    cursor: pointer; transition: all 0.3s;
 }
-
 .btn-actualizar:hover {
-    background: #ffdb6c;
-    transform: translateY(-2px) scale(1.05);
+    background: #ffdb6c; transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(255, 193, 7, 0.5);
 }
 
-/* D. Botón EXPORTAR EXCEL (EL IMPORTANTE - VERDE) */
-/* Usamos !important para asegurar que sobreescriba cualquier cosa */
-.btn-excel {
-    background: var(--gradiente-verde-excel) !important;
-    color: #ffffff !important;
-    border: none !important;
-    
-    /* Tamaño y forma */
-    padding: 12px 30px !important;
-    border-radius: 50px !important;
-    
-    /* Fuente */
-    font-family: 'Segoe UI', sans-serif;
-    font-weight: 800 !important;
-    font-size: 15px !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    
-    /* Comportamiento */
-    cursor: pointer;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    
-    /* Sombra */
-    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4) !important;
-    transition: all 0.3s ease !important;
-}
-
-.btn-excel:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 10px 25px rgba(40, 167, 69, 0.6) !important;
-    background: linear-gradient(135deg, #34ce57, #28a745) !important;
-}
-
 /* =========================================================
-   7. LISTAS DESPLEGABLES, ACORDEÓN Y TABLAS
+   7. TABLAS, LISTAS Y ACORDEÓN
    ========================================================= */
-details.lista-desplegable, 
-.tabla-institucion-container {
-    margin-bottom: 25px;
-    border-radius: 15px;
-    overflow: hidden;
-    background: white;
-    box-shadow: var(--sombra-suave);
-    border: 1px solid rgba(0,0,0,0.05);
-    transition: all 0.3s;
+details.lista-desplegable, .tabla-institucion-container {
+    margin-bottom: 25px; border-radius: 15px; overflow: hidden;
+    background: white; box-shadow: var(--sombra-suave);
+    border: 1px solid rgba(0,0,0,0.05); transition: all 0.3s;
 }
+details.lista-desplegable:hover { transform: translateY(-3px); box-shadow: var(--sombra-hover); }
 
 summary {
-    background: white;
-    padding: 20px 25px;
-    color: var(--azul-profundo);
-    font-weight: 800;
-    font-size: 1.1em;
-    border-left: 6px solid var(--azul-gob); /* Borde lateral azul */
-    cursor: pointer;
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    transition: background 0.3s;
-    outline: none;
+    background: white; padding: 20px 25px;
+    color: var(--azul-profundo); /* Azul oscuro */
+    font-weight: 800; font-size: 1.1em;
+    border-left: 6px solid var(--azul-gob);
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    transition: background 0.3s; outline: none;
 }
+summary:hover { background: #f8fbff; }
+summary::after { content: '+'; color: var(--azul-gob); font-size: 1.5em; font-weight: 900; }
+details[open] summary::after { content: '-'; transform: rotate(180deg); }
 
-summary:hover {
-    background: #f8fbff;
-}
-
-/* Icono del acordeón */
-summary::after { 
-    content: '+'; 
-    color: var(--azul-gob); 
-    font-size: 1.5em; 
-    font-weight: 900; 
-    transition: transform 0.3s;
-}
-
-details[open] summary::after { 
-    content: '-'; 
-    transform: rotate(180deg); 
-}
-
-/* Tabla interna */
-.tabla-responsive { 
-    overflow-x: auto; 
-    border-top: 1px solid #eee;
-}
-
-table { 
-    width: 100%; 
-    border-collapse: collapse; 
-    background: white; 
-}
-
+/* TABLAS INTERNAS */
+.tabla-responsive { overflow-x: auto; border-top: 1px solid #eee; }
+table { width: 100%; border-collapse: collapse; background: white; }
 th {
-    background: #f1f5f9;
-    color: var(--azul-profundo);
-    padding: 16px 20px;
-    text-transform: uppercase;
-    font-size: 0.8em;
-    letter-spacing: 1px;
-    border-bottom: 2px solid #e2e8f0;
-    text-align: left;
+    background: #f1f5f9; color: var(--azul-profundo);
+    padding: 16px 20px; text-transform: uppercase; font-size: 0.85em;
+    letter-spacing: 1px; border-bottom: 2px solid #e2e8f0; text-align: left;
 }
-
-td {
-    padding: 16px 20px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #555;
-    vertical-align: middle;
-}
-
-/* Efecto Cebra y Hover */
+td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; color: #333; vertical-align: middle; }
 tbody tr { transition: 0.2s; }
+tbody tr:hover { background-color: #f0f8ff; }
 
-tbody tr:hover {
-    background-color: #f0f8ff;
-    transform: scale(1.005);
-    z-index: 10;
-    position: relative;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-/* Etiquetas (Badges) */
+/* BADGES */
 .badge {
-    background: #e3f2fd;
-    color: var(--azul-gob);
-    padding: 5px 12px;
-    border-radius: 30px;
-    font-weight: 800;
-    font-size: 0.75em;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-summary .badge { 
-    background: #e3f2fd; 
-    color: var(--azul-gob); 
+    background: var(--azul-claro); color: var(--azul-gob);
+    padding: 5px 12px; border-radius: 30px; font-weight: 800;
+    font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px;
 }
 
 /* =========================================================
-   8. LOGIN, CAMPANITA Y EXTRAS ADMIN
+   8. LOGIN Y PANEL DE CONTROL
    ========================================================= */
+.login-card {
+    max-width: 420px; margin: 80px auto; padding: 40px;
+    background: rgba(255, 255, 255, 0.9); border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); text-align: center;
+    backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.6);
+    position: relative; overflow: hidden; animation: popIn 0.6s ease-out;
+}
+@keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: var(--gradiente-azul); }
+.login-card h2 { color: var(--azul-profundo); margin-bottom: 30px; font-size: 1.8em; }
 
-/* Campanita de Notificaciones */
+/* HEADER DASHBOARD AZUL */
+#dashboard > div:first-child {
+    background: var(--gradiente-azul) !important;
+    color: white; padding: 25px !important; border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 42, 77, 0.3); margin-bottom: 30px;
+    display: flex; justify-content: space-between; align-items: center;
+}
+#dashboard h2 { color: white !important; margin: 0; }
+
+/* CAJAS DE GESTIÓN */
+.gestion-box {
+    background: white; padding: 25px; border-radius: 16px;
+    box-shadow: var(--sombra-suave); border: 1px solid #eee;
+    transition: all 0.3s; position: relative;
+}
+.gestion-box:hover { transform: translateY(-5px); box-shadow: var(--sombra-hover); }
+/* Colores superiores de las cajas */
+.gestion-box:nth-child(1) { border-top: 5px solid #003366; }
+.gestion-box:nth-child(2) { border-top: 5px solid #5a32a3; }
+.gestion-box:nth-child(3) { border-top: 5px solid #c2185b; }
+
+.gestion-box h3 { margin-top: 0; color: var(--azul-profundo); }
+.gestion-box button {
+    background: var(--azul-gob); color: white; border: none; border-radius: 8px;
+    font-weight: bold; padding: 10px 15px; cursor: pointer; transition: 0.2s;
+}
+.gestion-box button:hover { transform: scale(1.1); background: var(--azul-profundo); }
+
+/* =========================================================
+   9. CAMPANITA Y RESPONSIVO
+   ========================================================= */
 #btnBell {
-    display: none; /* Se oculta por defecto hasta loguear */
-    position: fixed; 
-    top: 25px; 
-    right: 25px; 
-    z-index: 2000;
-    background: white; 
-    border: none; 
-    border-radius: 50%; 
-    width: 55px; 
-    height: 55px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2); 
-    cursor: pointer; 
-    font-size: 26px; 
-    transition: 0.3s;
+    display: none; position: fixed; top: 25px; right: 25px; z-index: 2000;
+    background: white; border: none; border-radius: 50%; width: 55px; height: 55px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2); cursor: pointer; font-size: 26px; transition: 0.3s;
 }
-
-#btnBell:hover { 
-    transform: rotate(15deg) scale(1.1); 
-}
-
-/* Punto Rojo de Notificación */
+#btnBell:hover { transform: rotate(15deg) scale(1.1); }
 .notificacion-activa::after {
-    content: ''; 
-    position: absolute; 
-    top: 2px; 
-    right: 2px; 
-    width: 14px; 
-    height: 14px;
-    background: #ff3b30; 
-    border: 3px solid white; 
-    border-radius: 50%; 
-    animation: pulse 2s infinite;
+    content: ''; position: absolute; top: 2px; right: 2px; width: 14px; height: 14px;
+    background: #ff3b30; border: 3px solid white; border-radius: 50%; animation: pulse 2s infinite;
 }
-
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); }
     70% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); }
     100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
 }
 
-/* Tarjeta de Login (Efecto Vidrio) */
-.login-card {
-    max-width: 420px;
-    margin: 80px auto;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 24px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    position: relative;
-    overflow: hidden;
-    animation: popIn 0.6s ease-out;
-}
-
-@keyframes popIn { 
-    from { transform: scale(0.9); opacity: 0; } 
-    to { transform: scale(1); opacity: 1; } 
-}
-
-.login-card::before {
-    content: ''; 
-    position: absolute; 
-    top: 0; left: 0; right: 0; 
-    height: 6px; 
-    background: var(--gradiente-azul);
-}
-
-.login-card h2 { 
-    color: var(--azul-profundo); 
-    margin-bottom: 30px; 
-    font-size: 1.8em; 
-}
-
-/* Panel de Control Admin (Header Azul) */
-#dashboard > div:first-child {
-    background: var(--gradiente-azul) !important;
-    color: white; 
-    padding: 25px !important; 
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0, 42, 77, 0.3); 
-    margin-bottom: 30px;
-}
-
-#dashboard h2 { 
-    color: white !important; 
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2); 
-}
-
-/* Widgets de Gestión (Listas de Instituciones) */
-.gestion-box {
-    background: white; 
-    padding: 25px; 
-    border-radius: 16px;
-    box-shadow: var(--sombra-suave); 
-    border: 1px solid #eee;
-    transition: all 0.3s; 
-    position: relative;
-}
-
-.gestion-box:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
-}
-
-/* Colores de borde superior para cada widget */
-.gestion-box:nth-child(1) { border-top: 5px solid #005696; }
-.gestion-box:nth-child(2) { border-top: 5px solid #6f42c1; }
-.gestion-box:nth-child(3) { border-top: 5px solid #e83e8c; }
-
-.gestion-box h3 { margin-top: 0; color: #333; font-size: 1.3em; }
-
-.gestion-box button {
-    background: var(--azul-gob); 
-    color: white; 
-    border: none; 
-    border-radius: 8px;
-    font-weight: bold; 
-    padding: 8px 12px; 
-    cursor: pointer; 
-    transition: 0.2s;
-}
-
-.gestion-box button:hover { 
-    transform: scale(1.1); 
-    background: var(--azul-profundo); 
-}
-
-/* =========================================================
-   9. RESPONSIVO (MÓVIL)
-   ========================================================= */
 @media (max-width: 600px) {
     .container { padding: 30px 20px; }
     h1 { font-size: 1.8em; }
-    
-    .btn-admin-top { 
-        position: relative; 
-        top: 0; 
-        right: 0; 
-        display: table; 
-        margin: 0 auto 20px auto; 
-    }
-    
-    .btn-excel {
-        width: 100%;
-        justify-content: center;
-        margin-top: 10px;
-    }
+    .btn-admin-top { position: relative; top: 0; right: 0; display: table; margin: 0 auto 20px auto; }
 }
