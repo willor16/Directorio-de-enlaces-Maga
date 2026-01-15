@@ -1,7 +1,7 @@
 import { sql } from '@vercel/postgres';
 
 export default async function handler(request, response) {
-    // Headers CORS (Para que no te bloquee el navegador)
+    // Headers CORS
     response.setHeader('Access-Control-Allow-Origin', '*');
     response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
     response.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-password');
@@ -11,17 +11,16 @@ export default async function handler(request, response) {
     try {
         // --- 1. PÚBLICO: SOLICITAR EDICIÓN ---
         if (request.method === 'POST') {
-            // CORRECCIÓN CLAVE: Verificamos si ya es objeto o es texto
+            // Parseo robusto: Si ya es objeto, úsalo; si es string, paréalo.
             const body = typeof request.body === 'string' ? JSON.parse(request.body) : request.body;
             
             const { registro_id, nuevos_datos } = body;
 
-            // Validar que lleguen los datos
+            // Validación básica
             if (!registro_id || !nuevos_datos) {
                 return response.status(400).json({ error: "Faltan datos (ID o nuevos datos)" });
             }
             
-            // Guardar en la base de datos
             await sql`
                 INSERT INTO ediciones_pendientes (registro_id, nuevos_datos) 
                 VALUES (${registro_id}, ${JSON.stringify(nuevos_datos)}::jsonb)
@@ -29,9 +28,9 @@ export default async function handler(request, response) {
             return response.status(200).json({ success: true });
         }
 
-        // --- ZONA ADMIN (Todo lo de abajo requiere contraseña) ---
+        // --- ZONA ADMIN (Requiere contraseña) ---
         const password = request.headers['x-admin-password'];
-        const passwordCorrecta = 'admin2026'; // TU CONTRASEÑA FIJA
+        const passwordCorrecta = 'admin2026'; 
 
         if (password !== passwordCorrecta) {
             return response.status(401).json({ error: 'No autorizado' });
@@ -52,7 +51,7 @@ export default async function handler(request, response) {
             const body = typeof request.body === 'string' ? JSON.parse(request.body) : request.body;
             const { solicitud_id, registro_id, datos_finales } = body;
             
-            // 1. Actualizar el registro original
+            // Actualizar registro original
             await sql`
                 UPDATE registros SET 
                     institucion = ${datos_finales.institucion},
@@ -66,7 +65,7 @@ export default async function handler(request, response) {
                 WHERE id = ${registro_id}
             `;
 
-            // 2. Borrar la solicitud de la lista de pendientes
+            // Borrar solicitud
             await sql`DELETE FROM ediciones_pendientes WHERE id = ${solicitud_id}`;
             
             return response.status(200).json({ success: true });
@@ -80,7 +79,7 @@ export default async function handler(request, response) {
         }
 
     } catch (error) {
-        console.error("Error en API Ediciones:", error);
+        console.error("Error API Ediciones:", error);
         return response.status(500).json({ error: error.message });
     }
 }

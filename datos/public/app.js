@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Cargas iniciales
     await cargarSelect('/api/listas?tipo=institucion', 'institucion');
     await cargarSelect('/api/listas?tipo=departamento', 'departamento');
-    gestionarTerritorio(); // Configurar estado inicial
+    gestionarTerritorio(); // Configurar estado inicial del formulario
     cargarDirectorioPublico(); // Cargar la tabla pública
 });
 
-// --- LÓGICA DEL FORMULARIO ---
+// --- LÓGICA DEL FORMULARIO DE REGISTRO ---
 
 async function cargarSelect(url, idElemento) {
     try {
@@ -90,15 +90,15 @@ document.getElementById('registroForm').addEventListener('submit', async (e) => 
             Swal.fire('¡Éxito!', 'Registro guardado.', 'success');
             document.getElementById('registroForm').reset();
             document.getElementById('municipio').disabled = true;
-            document.getElementById('divMunicipio').style.display = 'block';
-            cargarDirectorioPublico(); // Recargar la tabla pública
+            document.getElementById('divMunicipio').style.display = 'block'; // Reset visual
+            cargarDirectorioPublico(); // Recargar la tabla pública abajo
         } else { Swal.fire('Error', 'No se pudo guardar', 'error'); }
     } catch (err) { Swal.fire('Error', 'Error de conexión', 'error'); }
     
     btn.innerText = textoOriginal; btn.disabled = false;
 });
 
-// --- LÓGICA DIRECTORIO PÚBLICO Y CORRECCIONES ---
+// --- LÓGICA DIRECTORIO PÚBLICO Y SOLICITUD DE CORRECCIONES ---
 
 async function cargarDirectorioPublico() {
     const contenedor = document.getElementById('contenedorDirectorio');
@@ -178,7 +178,7 @@ window.abrirModalCorreccion = async function(registro) {
                 unidad: document.getElementById('swal-unidad').value,
                 correo: document.getElementById('swal-correo').value,
                 celular: document.getElementById('swal-celular').value,
-                // Datos base no editables por usuario
+                // Mantenemos los datos originales no editables
                 institucion: registro.institucion,
                 departamento: registro.departamento,
                 municipio: registro.municipio
@@ -190,11 +190,22 @@ window.abrirModalCorreccion = async function(registro) {
         try {
             const res = await fetch('/api/ediciones', {
                 method: 'POST',
+                // --- ¡AQUÍ ESTÁ LA CORRECCIÓN CLAVE! ---
+                headers: { 'Content-Type': 'application/json' },
+                // ---------------------------------------
                 body: JSON.stringify({ registro_id: registro.id, nuevos_datos: formValues })
             });
             
-            if(res.ok) Swal.fire('Enviado', 'El administrador revisará tu corrección.', 'success');
-            else Swal.fire('Error', 'No se pudo enviar.', 'error');
-        } catch(e) { Swal.fire('Error', 'Fallo de conexión.', 'error'); }
+            if(res.ok) {
+                Swal.fire('Enviado', 'El administrador revisará tu corrección.', 'success');
+            } else {
+                const errorData = await res.json();
+                console.error("Error servidor:", errorData);
+                Swal.fire('Error', 'No se pudo enviar la solicitud.', 'error');
+            }
+        } catch(e) { 
+            console.error(e);
+            Swal.fire('Error', 'Fallo de conexión.', 'error'); 
+        }
     }
 };
