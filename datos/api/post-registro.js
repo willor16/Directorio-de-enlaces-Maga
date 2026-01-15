@@ -1,21 +1,24 @@
 import { sql } from '@vercel/postgres';
 
 export default async function handler(request, response) {
-  if (request.method !== 'POST') return response.status(405).json({ error: 'Method Not Allowed' });
-  
-  try {
-    const { institucion, departamento, municipio, nombre, puesto, unidad, correo, celular } = request.body;
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     
-    // Validación básica
-    if (!correo || !nombre) throw new Error('Faltan datos');
+    if (request.method === 'OPTIONS') return response.status(200).end();
 
-    await sql`
-      INSERT INTO registros (institucion, departamento, municipio, nombre_completo, puesto, unidad_direccion, correo, celular)
-      VALUES (${institucion}, ${departamento}, ${municipio}, ${nombre}, ${puesto}, ${unidad}, ${correo}, ${celular});
-    `;
-    
-    return response.status(200).json({ success: true });
-  } catch (error) {
-    return response.status(500).json({ error: error.message });
-  }
+    if (request.method === 'POST') {
+        try {
+            const body = typeof request.body === 'string' ? JSON.parse(request.body) : request.body;
+            const { institucion, departamento, municipio, nombre, puesto, unidad, correo, celular } = body;
+
+            await sql`
+                INSERT INTO registros (institucion, departamento, municipio, nombre_completo, puesto, unidad_direccion, correo, celular)
+                VALUES (${institucion}, ${departamento}, ${municipio}, ${nombre}, ${puesto}, ${unidad}, ${correo}, ${celular});
+            `;
+
+            return response.status(200).json({ success: true });
+        } catch (error) {
+            return response.status(500).json({ error: error.message });
+        }
+    }
 }
